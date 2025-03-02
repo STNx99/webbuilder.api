@@ -1,0 +1,115 @@
+@webbuilder.api_HostAddress = http://localhost:5232
+
+GET http://localhost:5232/api/elements
+Accept: application/json
+
+###
+POST http://localhost:5232/api/elements
+Accept: application/json
+Content-Type: application/json
+
+{
+  "type": "Frame",
+  "id": "Frame-outer",
+  "content": "Outer Frame",
+  "isSelected": false,
+  "x": 0,
+  "y": 0,
+  "styles": {
+    "justifyContent": "center",
+    "alignItems": "center",
+    "textAlign": "center",
+    "height": "400px",
+    "width": "100%",
+    "display": "flex",
+    "flexDirection": "column"
+  },
+  "elements": [
+    {
+      "type": "Text",
+      "id": "Text-1",
+      "content": "Text in Outer Frame",
+      "isSelected": false,
+      "x": 0,
+      "y": 0,
+      "styles": {
+        "justifyContent": "center",
+        "alignItems": "center",
+        "textAlign": "center",
+        "height": "50px",
+        "width": "100px"
+      }
+    },
+    {
+      "type": "Frame",
+      "id": "Frame-inner",
+      "content": "Inner Frame",
+      "isSelected": false,
+      "x": 0,
+      "y": 0,
+      "styles": {
+        "justifyContent": "center",
+        "alignItems": "center",
+        "textAlign": "center",
+        "height": "200px",
+        "width": "80%",
+        "display": "flex",
+        "flexDirection": "row"
+      },
+      "elements": [
+        {
+          "type": "Text",
+          "id": "Text-2",
+          "content": "Text in Inner Frame",
+          "isSelected": false,
+          "x": 0,
+          "y": 0,
+          "styles": {
+            "justifyContent": "center",
+            "alignItems": "center",
+            "textAlign": "center",
+            "height": "50px",
+            "width": "100px"
+          }
+        },
+        {
+          "type": "Text",
+          "id": "Text-3",
+          "content": "Another Text in Inner Frame",
+          "isSelected": false,
+          "x": 0,
+          "y": 0,
+          "styles": {
+            "justifyContent": "center",
+            "alignItems": "center",
+            "textAlign": "center",
+            "height": "50px",
+            "width": "100px"
+          }
+        }
+      ]
+    }
+  ]
+}
+
+###
+POST http://localhost:5232/api/elements
+Accept: application/json
+Content-Type: application/json
+
+{
+  "type": "Text",
+  "id": "Text-4",
+  "content": "Text outside of Frames",
+  "isSelected": false,
+  "x": 0,
+  "y": 0,
+  "styles": {
+    "justifyContent": "center",
+    "alignItems": "center",
+    "textAlign": "center",
+    "height": "50px",
+    "width": "100px"
+  }
+}
+
