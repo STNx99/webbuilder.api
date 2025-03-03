@@ -14,7 +14,7 @@ namespace webbuilder.api.services
             _dbContext = dbContext;
         }
 
-        public async Task<ElementDto> CreateElement(ElementDto element)
+        public async Task<ElementDto> CreateElement(CreateElementDto element)
         {
             var newElement = element.ToElement();
             await _dbContext.Elements.AddAsync(newElement);
@@ -28,19 +28,38 @@ namespace webbuilder.api.services
             return elements.Select(e => e.ToElementDto()).ToList();
         }
 
-        public async Task<bool> DeleteElement(DeleteElementDto element)
+        public async Task<bool> DeleteElement(string id)
         {
-            var elementToDelete = await _dbContext.Elements.FirstOrDefaultAsync(e => e.Id == element.Id);
+            var elementToDelete = await _dbContext.Elements.FirstOrDefaultAsync(e => e.Id == id);
             if (elementToDelete == null)
             {
                 return false;
             }
-
             _dbContext.Elements.Remove(elementToDelete);
             await _dbContext.SaveChangesAsync();
             return true;
         }
 
+        public async Task<bool> UpdateElement(UpdateElementDto element)
+        {
+            var elementToUpdate = await _dbContext.Elements.FirstOrDefaultAsync(e => e.Id == element.Id);
+            if (elementToUpdate == null)
+            {
+                return false;
+            }
+
+            elementToUpdate.Type = element.Type;
+            elementToUpdate.Content = element.Content;
+            elementToUpdate.IsSelected = element.IsSelected;
+            elementToUpdate.Styles = element.Styles;
+            elementToUpdate.X = element.X;
+            elementToUpdate.Y = element.Y;
+            elementToUpdate.Src = element.Src ?? elementToUpdate.Src;
+            elementToUpdate.Href = element.Href ?? elementToUpdate.Href;
+
+            await _dbContext.SaveChangesAsync();
+            return true;
+        }
 
     }
 }

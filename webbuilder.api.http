@@ -113,3 +113,29 @@ Content-Type: application/json
   }
 }
 
+###
+PUT http://localhost:5232/api/elements
+Accept: application/json
+Content-Type: application/json
+
+{
+  "type": "Text",
+  "id": "Text-4",
+  "content": "Text outside of Frames",
+  "isSelected": false,
+  "x": 0,
+  "y": 404,
+  "styles": {
+    "justifyContent": "center",
+    "alignItems": "center",
+    "textAlign": "center",
+    "height": "100px",
+    "width": "2000px"
+  }
+}
+
+###
+DELETE http://localhost:5232/api/elements/Text-4
+Accept: application/json
+
+

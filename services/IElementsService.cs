@@ -4,11 +4,9 @@ namespace webbuilder.api.services
 {
     public interface IElementsService
     {
-        Task<ElementDto> CreateElement(ElementDto element);
+        Task<ElementDto> CreateElement(CreateElementDto element);
         Task<IEnumerable<ElementDto>> GetElements();
-
-        Task<bool> DeleteElement(DeleteElementDto element)
-
+        Task<bool> DeleteElement(string id);
         Task<bool> UpdateElement(UpdateElementDto element);
     }
 }

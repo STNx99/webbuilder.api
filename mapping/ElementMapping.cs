@@ -5,7 +5,7 @@ namespace webbuilder.api.mapping
 {
     public static class ElementMapping
     {
-        public static Element ToElement(this ElementDto element, string? parentId = null)
+        public static Element ToElement(this CreateElementDto element)
         {
             return new Element()
             {
@@ -18,7 +18,7 @@ namespace webbuilder.api.mapping
                 Y = element.Y,
                 Src = element.Src,
                 Href = element.Href,
-                ParentId = parentId
+                ParentId = element.ParentId
             };
         }
 
@@ -80,22 +80,7 @@ namespace webbuilder.api.mapping
 
             return frameElementDto;
         }
-        public static Element ToUpdate(this UpdateElementDto element)
-        {
-            return new Element()
-            {
-                Type = element.Type,
-                Id = element.Id,
-                Content = element.Content,
-                IsSelected = element.IsSelected,
-                Styles = element.Styles,
-                X = element.X,
-                Y = element.Y,
-                Src = element.Src,
-                Href = element.Href
-            };
 
-        }
     }
 
 }
