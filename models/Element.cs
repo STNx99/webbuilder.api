@@ -36,5 +36,8 @@ namespace webbuilder.api.models
 
         [JsonPropertyName("parentId")]
         public string? ParentId { get; set; }
+
+        [JsonPropertyName("projectId")]
+        public string? ProjectId { get; set; }
     }
 }

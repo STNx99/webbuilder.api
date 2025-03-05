@@ -26,6 +26,8 @@ namespace webbuilder.api.dtos
         public string? Src { get; init; }
         [JsonPropertyName("href")]
         public string? Href { get; init; }
+        [JsonPropertyName("parentId")]
+        public string? ParentId { get; init; }
     }
 
     public record class FrameElementDto : ElementDto

@@ -22,10 +22,10 @@ namespace webbuilder.api.controllers
             return Ok(result);
         }
 
-        [HttpGet]
-        public async Task<IActionResult> Get()
+        [HttpGet("{id}")]
+        public async Task<IActionResult> Get(string id)
         {
-            var result = await _elementsService.GetElements();
+            var result = await _elementsService.GetElements(id);
             return Ok(result);
         }
 

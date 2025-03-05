@@ -135,7 +135,7 @@ Content-Type: application/json
 }
 
 ###
-DELETE http://localhost:5232/api/elements/Text-4
+DELETE http://localhost:5232/api/elements/Frame-6aea60a4-346f-4d44-ae3b-763f905acd88
 Accept: application/json
 
 

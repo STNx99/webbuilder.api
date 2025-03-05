@@ -18,7 +18,8 @@ namespace webbuilder.api.mapping
                 Y = element.Y,
                 Src = element.Src,
                 Href = element.Href,
-                ParentId = element.ParentId
+                ParentId = element.ParentId,
+                ProjectId = "1"
             };
         }
 
@@ -45,7 +46,8 @@ namespace webbuilder.api.mapping
                 X = element.X,
                 Y = element.Y,
                 Src = element.Src,
-                Href = element.Href
+                Href = element.Href,
+                ParentId = element.ParentId
             };
         }
 
@@ -67,6 +69,7 @@ namespace webbuilder.api.mapping
                 Y = element.Y,
                 Src = element.Src,
                 Href = element.Href,
+                ParentId = element.ParentId,
                 Elements = new List<ElementDto>()
             };
 

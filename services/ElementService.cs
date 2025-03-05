@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using webbuilder.api.data;
 using webbuilder.api.dtos;
 using webbuilder.api.mapping;
+using webbuilder.api.models;
 
 namespace webbuilder.api.services
 {
@@ -22,18 +23,27 @@ namespace webbuilder.api.services
             return newElement.ToElementDto();
         }
 
-        public async Task<IEnumerable<ElementDto>> GetElements()
+        public async Task<IEnumerable<ElementDto>> GetElements(string id)
         {
-            var elements = await _dbContext.Elements.ToListAsync();
-            return elements.Select(e => e.ToElementDto()).ToList();
+            var elements = await _dbContext.Elements.Where(e => e.ProjectId == id).ToListAsync();
+            return elements.Select(e => e.ToElementDto()).Where(e => e.ParentId == null).ToList();
         }
 
         public async Task<bool> DeleteElement(string id)
         {
-            var elementToDelete = await _dbContext.Elements.FirstOrDefaultAsync(e => e.Id == id);
+            var elementToDelete = await _dbContext.Elements
+                .Include(e => (e as FrameElement).Elements)
+                .FirstOrDefaultAsync(e => e.Id == id);
             if (elementToDelete == null)
             {
                 return false;
+            }
+            if (elementToDelete is FrameElement frameElementToDelete && frameElementToDelete.Elements != null)
+            {
+                foreach (var children in frameElementToDelete.Elements.ToList())
+                {
+                    await DeleteElement(children.Id);
+                }
             }
             _dbContext.Elements.Remove(elementToDelete);
             await _dbContext.SaveChangesAsync();
