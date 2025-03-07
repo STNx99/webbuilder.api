@@ -15,7 +15,7 @@ namespace webbuilder.api.dtos
         [JsonPropertyName("content")]
         public string? Content { get; init; }
         [JsonPropertyName("isSelected")]
-        public bool IsSelected { get; init; }
+        public bool IsSelected { get; init; } = false;
         [JsonPropertyName("styles")]
         public Dictionary<string, string> Styles { get; init; } = new Dictionary<string, string>();
         [JsonPropertyName("x")]
@@ -28,6 +28,8 @@ namespace webbuilder.api.dtos
         public string? Href { get; init; }
         [JsonPropertyName("parentId")]
         public string? ParentId { get; init; }
+        [JsonPropertyName("projectId")]
+        [Required] public required string ProjectId { get; init; }
     }
 
     public record class FrameElementDto : ElementDto

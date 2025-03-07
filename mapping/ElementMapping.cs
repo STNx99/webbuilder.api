@@ -12,14 +12,14 @@ namespace webbuilder.api.mapping
                 Type = element.Type,
                 Id = element.Id,
                 Content = element.Content,
-                IsSelected = element.IsSelected,
+                IsSelected = false,
                 Styles = element.Styles,
                 X = element.X,
                 Y = element.Y,
                 Src = element.Src,
                 Href = element.Href,
                 ParentId = element.ParentId,
-                ProjectId = "1"
+                ProjectId = element.ProjectId
             };
         }
 
@@ -41,13 +41,14 @@ namespace webbuilder.api.mapping
                 Type = element.Type,
                 Id = element.Id,
                 Content = element.Content,
-                IsSelected = element.IsSelected,
+                IsSelected = false,
                 Styles = element.Styles,
                 X = element.X,
                 Y = element.Y,
                 Src = element.Src,
                 Href = element.Href,
-                ParentId = element.ParentId
+                ParentId = element.ParentId,
+                ProjectId = element.ProjectId
             };
         }
 
@@ -63,13 +64,14 @@ namespace webbuilder.api.mapping
                 Type = element.Type,
                 Id = element.Id,
                 Content = element.Content ?? string.Empty,
-                IsSelected = element.IsSelected,
+                IsSelected = false,
                 Styles = element.Styles ?? new Dictionary<string, string>(),
                 X = element.X,
                 Y = element.Y,
                 Src = element.Src,
                 Href = element.Href,
                 ParentId = element.ParentId,
+                ProjectId = element.ProjectId,
                 Elements = new List<ElementDto>()
             };
 

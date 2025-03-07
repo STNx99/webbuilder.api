@@ -16,28 +16,30 @@ namespace webbuilder.api.services
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<bool> CreateProjectAsync(ProjectDto project)
+        public async Task<ProjectDto> CreateProjectAsync(ProjectDto project)
         {
-            if (project == null)
+            var find = await _context.Projects.FirstOrDefaultAsync(p => p.Name == project.Name);
+            if (find != null)
             {
-                throw new ArgumentNullException(nameof(project));
+                throw new ArgumentException("Project with this name already exists");
             }
+            ArgumentNullException.ThrowIfNull(project);
 
             var httpContext = _httpContextAccessor.HttpContext;
             if (httpContext == null)
             {
-                return false;
+                return null;
             }
 
             if (!httpContext.Items.TryGetValue("userId", out var userId))
             {
-                return false;
+                throw new ArgumentException("User ID cannot be null or empty.", nameof(userId));
             }
 
             var newProject = project.ToProject(userId.ToString());
             await _context.Projects.AddAsync(newProject);
             await _context.SaveChangesAsync();
-            return true;
+            return newProject.ToProjectDto();
         }
 
         public async Task<IEnumerable<ProjectDto>> GetProjectsAsync()
@@ -67,7 +69,7 @@ namespace webbuilder.api.services
             {
                 return false;
             }
-            if(!httpContext.Items.TryGetValue("userId", out var userId))
+            if (!httpContext.Items.TryGetValue("userId", out var userId))
             {
                 return false;
             }

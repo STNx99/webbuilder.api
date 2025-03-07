@@ -17,6 +17,7 @@ builder.Services.AddDbContext<ElementStoreContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<IElementsService, ElementsService>();
+builder.Services.AddScoped<IProjectsService, ProjectsService>();
 builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
@@ -26,7 +27,7 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
-// app.UseUserAuthenticate();
+app.UseUserAuthenticate();
 app.UseHttpsRedirection();
 app.MapControllers();
 app.Run();

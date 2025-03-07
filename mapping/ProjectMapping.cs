@@ -20,6 +20,7 @@ namespace webbuilder.api.mapping
         {
             return new ProjectDto
             {
+                Id = project.Id,
                 Name = project.Name,
                 Description = project.Description
             };

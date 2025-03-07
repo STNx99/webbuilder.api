@@ -5,7 +5,7 @@ namespace webbuilder.api.services
 {
     public interface IProjectsService
     {
-        public Task<bool> CreateProjectAsync(ProjectDto project);
+        public Task<ProjectDto> CreateProjectAsync(ProjectDto project);
         public Task<IEnumerable<ProjectDto>> GetProjectsAsync();
         public Task<bool> DeleteProjectAsync(string id);
     }
