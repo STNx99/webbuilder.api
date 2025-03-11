@@ -20,7 +20,7 @@ namespace webbuilder.api.models
         public bool IsSelected { get; set; }
 
         [JsonPropertyName("styles")]
-        public Dictionary<string, string> Styles { get; set; } = new();
+        public Dictionary<string, object> Styles { get; set; } = [];
 
         [JsonPropertyName("x")]
         public int X { get; set; }
@@ -38,6 +38,6 @@ namespace webbuilder.api.models
         public string? ParentId { get; set; }
 
         [JsonPropertyName("projectId")]
-        public string? ProjectId { get; set; }
+        public required string ProjectId { get; set; }
     }
 }

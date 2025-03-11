@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using webbuilder.api.dtos;
 using webbuilder.api.services;
@@ -5,7 +6,7 @@ using webbuilder.api.services;
 namespace webbuilder.api.controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     public class ProjectsController : ControllerBase
     {
         private readonly IProjectsService _projectsService;

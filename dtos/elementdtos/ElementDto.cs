@@ -4,7 +4,8 @@ using System.Text.Json.Serialization;
 namespace webbuilder.api.dtos
 {
     [JsonPolymorphic(TypeDiscriminatorPropertyName = "Type")]
-    [JsonDerivedType(typeof(ElementDto), typeDiscriminator: "Text")]
+    [JsonDerivedType(typeof(TextElementDto), typeDiscriminator: "Text")]
+    [JsonDerivedType(typeof(AElementDto), typeDiscriminator: "A")]
     [JsonDerivedType(typeof(FrameElementDto), typeDiscriminator: "Frame")]
     public record class ElementDto
     {
@@ -17,7 +18,8 @@ namespace webbuilder.api.dtos
         [JsonPropertyName("isSelected")]
         public bool IsSelected { get; init; } = false;
         [JsonPropertyName("styles")]
-        public Dictionary<string, string> Styles { get; init; } = new Dictionary<string, string>();
+        public Dictionary<string, object> Styles { get; init; } = [];
+
         [JsonPropertyName("x")]
         public int X { get; init; }
         [JsonPropertyName("y")]
@@ -30,6 +32,15 @@ namespace webbuilder.api.dtos
         public string? ParentId { get; init; }
         [JsonPropertyName("projectId")]
         [Required] public required string ProjectId { get; init; }
+    }
+    public record class TextElementDto : ElementDto
+    {
+
+    }
+
+    public record class AElementDto : ElementDto
+    {
+
     }
 
     public record class FrameElementDto : ElementDto

@@ -5,7 +5,7 @@ using webbuilder.api.services;
 namespace webbuilder.api.controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     public class ElementsController : ControllerBase
     {
         private readonly IElementsService _elementsService;
@@ -52,6 +52,6 @@ namespace webbuilder.api.controllers
 
             return NoContent();
         }
-        
+
     }
 }

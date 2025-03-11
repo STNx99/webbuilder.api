@@ -65,7 +65,7 @@ namespace webbuilder.api.mapping
                 Id = element.Id,
                 Content = element.Content ?? string.Empty,
                 IsSelected = false,
-                Styles = element.Styles ?? new Dictionary<string, string>(),
+                Styles = element.Styles ?? new Dictionary<string, object>(),
                 X = element.X,
                 Y = element.Y,
                 Src = element.Src,

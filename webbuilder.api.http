@@ -1,6 +1,6 @@
 @webbuilder.api_HostAddress = http://localhost:5232
 
-GET http://localhost:5232/api/elements/36872449-b0ba-4a70-ad45-5e08befdc922
+GET http://localhost:5232/api/v1/elements/36872449-b0ba-4a70-ad45-5e08befdc922
 Accept: application/json
 
 ###

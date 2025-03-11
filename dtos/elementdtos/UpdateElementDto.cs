@@ -14,7 +14,7 @@ namespace webbuilder.api.dtos
         [JsonPropertyName("isSelected")]
         public bool IsSelected { get; init; }
         [JsonPropertyName("styles")]
-        public Dictionary<string, string> Styles { get; init; } = new Dictionary<string, string>();
+        public Dictionary<string, object> Styles { get; init; } = [];
         [JsonPropertyName("x")]
         public int X { get; init; }
         [JsonPropertyName("y")]

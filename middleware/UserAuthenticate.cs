@@ -1,8 +1,5 @@
 using System.IdentityModel.Tokens.Jwt;
-using System.Runtime.CompilerServices;
-using Clerk.BackendAPI;
 using Clerk.BackendAPI.Helpers.Jwks;
-using Microsoft.Extensions.Logging; // Add this for logging
 
 namespace webbuilder.api.middleware
 {
