@@ -64,12 +64,12 @@ namespace webbuilder.api.Migrations
                         .HasColumnType("character varying(8)")
                         .HasAnnotation("Relational:JsonPropertyName", "type");
 
-                    b.Property<int>("X")
-                        .HasColumnType("integer")
+                    b.Property<double>("X")
+                        .HasColumnType("double precision")
                         .HasAnnotation("Relational:JsonPropertyName", "x");
 
-                    b.Property<int>("Y")
-                        .HasColumnType("integer")
+                    b.Property<double>("Y")
+                        .HasColumnType("double precision")
                         .HasAnnotation("Relational:JsonPropertyName", "y");
 
                     b.HasKey("Id");

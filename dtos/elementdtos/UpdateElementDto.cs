@@ -16,9 +16,9 @@ namespace webbuilder.api.dtos
         [JsonPropertyName("styles")]
         public Dictionary<string, object> Styles { get; init; } = [];
         [JsonPropertyName("x")]
-        public int X { get; init; }
+        public double X { get; init; }
         [JsonPropertyName("y")]
-        public int Y { get; init; }
+        public double Y { get; init; }
         [JsonPropertyName("src")]
         public string? Src { get; init; }
         [JsonPropertyName("href")]

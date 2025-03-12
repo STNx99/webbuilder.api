@@ -23,10 +23,10 @@ namespace webbuilder.api.models
         public Dictionary<string, object> Styles { get; set; } = [];
 
         [JsonPropertyName("x")]
-        public int X { get; set; }
+        public double X { get; set; }
 
         [JsonPropertyName("y")]
-        public int Y { get; set; }
+        public double Y { get; set; }
 
         [JsonPropertyName("src")]
         public string? Src { get; set; }
