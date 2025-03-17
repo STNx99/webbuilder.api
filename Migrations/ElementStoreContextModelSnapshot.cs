@@ -40,6 +40,9 @@ namespace webbuilder.api.Migrations
                         .HasColumnType("boolean")
                         .HasAnnotation("Relational:JsonPropertyName", "isSelected");
 
+                    b.Property<int>("Order")
+                        .HasColumnType("integer");
+
                     b.Property<string>("ParentId")
                         .HasColumnType("text")
                         .HasAnnotation("Relational:JsonPropertyName", "parentId");

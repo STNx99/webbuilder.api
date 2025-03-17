@@ -5,10 +5,10 @@ namespace webbuilder.api.dtos
 {
     public record class UpdateElementDto
     {
-        [JsonPropertyName("type")]
-        [Required] public required string Type { get; init; }
         [JsonPropertyName("id")]
         [Required] public required string Id { get; init; }
+        [JsonPropertyName("type")]
+        [Required] public required string Type { get; init; }
         [JsonPropertyName("content")]
         public string? Content { get; init; }
         [JsonPropertyName("isSelected")]

@@ -22,6 +22,9 @@ namespace webbuilder.api.models
         [JsonPropertyName("styles")]
         public Dictionary<string, object> Styles { get; set; } = [];
 
+        [JsonPropertyName("order")]
+        public int Order { get; set; }
+
         [JsonPropertyName("x")]
         public double X { get; set; }
 

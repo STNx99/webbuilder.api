@@ -5,7 +5,7 @@ namespace webbuilder.api.mapping
 {
     public static class ElementMapping
     {
-        public static Element ToElement(this CreateElementDto element)
+        public static Element ToElement(this CreateElementDto element, int order)
         {
             return new Element()
             {
@@ -19,10 +19,10 @@ namespace webbuilder.api.mapping
                 Src = element.Src,
                 Href = element.Href,
                 ParentId = element.ParentId,
-                ProjectId = element.ProjectId
+                ProjectId = element.ProjectId,
+                Order = order
             };
         }
-
 
         public static ElementDto ToElementDto(this Element element)
         {
@@ -48,7 +48,7 @@ namespace webbuilder.api.mapping
                 Src = element.Src,
                 Href = element.Href,
                 ParentId = element.ParentId,
-                ProjectId = element.ProjectId
+                ProjectId = element.ProjectId,
             };
         }
 
@@ -63,21 +63,21 @@ namespace webbuilder.api.mapping
             {
                 Type = element.Type,
                 Id = element.Id,
-                Content = element.Content ?? string.Empty,
+                Content = element.Content,
                 IsSelected = false,
-                Styles = element.Styles ?? new Dictionary<string, object>(),
+                Styles = element.Styles,
                 X = element.X,
                 Y = element.Y,
                 Src = element.Src,
                 Href = element.Href,
                 ParentId = element.ParentId,
                 ProjectId = element.ProjectId,
-                Elements = new List<ElementDto>()
+                Elements = []
             };
 
             if (element is FrameElement frameElement && frameElement.Elements != null)
             {
-                foreach (var child in frameElement.Elements)
+                foreach (var child in frameElement.Elements.OrderBy(e => e.Order))
                 {
                     frameElementDto.Elements.Add(child.ToElementDto());
                 }

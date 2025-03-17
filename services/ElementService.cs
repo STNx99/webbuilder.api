@@ -17,7 +17,10 @@ namespace webbuilder.api.services
 
         public async Task<ElementDto> CreateElement(CreateElementDto element)
         {
-            var newElement = element.ToElement();
+            var childCount = await _dbContext.Elements
+                .CountAsync(e => e.ParentId == element.ParentId);
+
+            var newElement = element.ToElement(childCount);
             await _dbContext.Elements.AddAsync(newElement);
             await _dbContext.SaveChangesAsync();
             return newElement.ToElementDto();
@@ -25,26 +28,37 @@ namespace webbuilder.api.services
 
         public async Task<IEnumerable<ElementDto>> GetElements(string id)
         {
-            var elements = await _dbContext.Elements.Where(e => e.ProjectId == id).ToListAsync();
-            return elements.Select(e => e.ToElementDto()).Where(e => e.ParentId == null).ToList();
+            var elements = await _dbContext.Elements.Where(e => e.ProjectId == id).OrderBy(e => e.Order).ToListAsync();
+            return [.. elements.Select(e => e.ToElementDto()).Where(e => e.ParentId == null)];
         }
-
         public async Task<bool> DeleteElement(string id)
         {
             var elementToDelete = await _dbContext.Elements
                 .Include(e => (e as FrameElement).Elements)
                 .FirstOrDefaultAsync(e => e.Id == id);
+
             if (elementToDelete == null)
             {
                 return false;
             }
+
+            var siblings = await _dbContext.Elements
+                .Where(e => e.ParentId == elementToDelete.ParentId && e.Order > elementToDelete.Order)
+                .ToListAsync();
+
+            foreach (var sibling in siblings)
+            {
+                sibling.Order--;
+            }
+
             if (elementToDelete is FrameElement frameElementToDelete && frameElementToDelete.Elements != null)
             {
-                foreach (var children in frameElementToDelete.Elements.ToList())
+                foreach (var child in frameElementToDelete.Elements.ToList())
                 {
-                    await DeleteElement(children.Id);
+                    await DeleteElement(child.Id);
                 }
             }
+
             _dbContext.Elements.Remove(elementToDelete);
             await _dbContext.SaveChangesAsync();
             return true;
