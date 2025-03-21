@@ -41,7 +41,8 @@ namespace webbuilder.api.Migrations
                         .HasAnnotation("Relational:JsonPropertyName", "isSelected");
 
                     b.Property<int>("Order")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasAnnotation("Relational:JsonPropertyName", "order");
 
                     b.Property<string>("ParentId")
                         .HasColumnType("text")
@@ -124,15 +125,12 @@ namespace webbuilder.api.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("FirstName")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("ImageUrl")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("LastName")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime>("UpdatedAt")

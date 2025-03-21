@@ -28,8 +28,12 @@ namespace webbuilder.api.services
 
         public async Task<IEnumerable<ElementDto>> GetElements(string id)
         {
-            var elements = await _dbContext.Elements.Where(e => e.ProjectId == id).OrderBy(e => e.Order).ToListAsync();
-            return [.. elements.Select(e => e.ToElementDto()).Where(e => e.ParentId == null)];
+            var elements = await _dbContext.Elements
+                .Where(e => e.ProjectId == id)
+                .OrderBy(e => e.Order)
+                .ToListAsync();
+
+            return elements.Select(e => e.ToElementDto()).Where(e => e.ParentId == null);
         }
         public async Task<bool> DeleteElement(string id)
         {
