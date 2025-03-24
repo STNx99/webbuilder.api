@@ -68,6 +68,28 @@ namespace webbuilder.api.services
             return true;
         }
 
+        public async Task<bool> BatchCreateElements(IEnumerable<CreateElementDto> elements)
+        {
+            if (!elements.Any())
+            {
+                throw new ArgumentException("The elements collection cannot be empty.");
+            }
+
+            var parentId = elements.First().ParentId;
+
+            var childCount = await _dbContext.Elements
+                .CountAsync(e => e.ParentId == parentId);
+
+            foreach (var element in elements)
+            {
+                var newElement = element.ToElement(childCount);
+                await _dbContext.Elements.AddAsync(newElement);
+                childCount++;
+            }
+
+            await _dbContext.SaveChangesAsync();
+            return true;
+        }
         public async Task<bool> UpdateElement(UpdateElementDto element)
         {
             var elementToUpdate = await _dbContext.Elements.FirstOrDefaultAsync(e => e.Id == element.Id);
@@ -77,6 +99,7 @@ namespace webbuilder.api.services
             }
 
             elementToUpdate.Type = element.Type;
+            elementToUpdate.Name = element.Name;
             elementToUpdate.Content = element.Content;
             elementToUpdate.IsSelected = element.IsSelected;
             elementToUpdate.Styles = element.Styles;

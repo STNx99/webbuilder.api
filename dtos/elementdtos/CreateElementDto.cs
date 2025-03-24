@@ -9,6 +9,8 @@ namespace webbuilder.api.dtos
         [Required] public required string Type { get; init; }
         [JsonPropertyName("id")]
         [Required] public required string Id { get; init; }
+        [JsonPropertyName("name")]
+        public string? Name { get; init; }
         [JsonPropertyName("content")]
         public string? Content { get; init; }
         [JsonPropertyName("isSelected")]

@@ -22,6 +22,13 @@ namespace webbuilder.api.controllers
             return Ok(result);
         }
 
+        [HttpPost("batch")]
+        public async Task<IActionResult> BatchPost([FromBody] BatchCreateElementsDto request)
+        {
+            var result = await _elementsService.BatchCreateElements(request.Elements);
+            return Ok(result);
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(string id)
         {
