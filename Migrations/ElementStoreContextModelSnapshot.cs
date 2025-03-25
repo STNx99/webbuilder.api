@@ -40,6 +40,10 @@ namespace webbuilder.api.Migrations
                         .HasColumnType("boolean")
                         .HasAnnotation("Relational:JsonPropertyName", "isSelected");
 
+                    b.Property<string>("Name")
+                        .HasColumnType("text")
+                        .HasAnnotation("Relational:JsonPropertyName", "name");
+
                     b.Property<int>("Order")
                         .HasColumnType("integer")
                         .HasAnnotation("Relational:JsonPropertyName", "order");
@@ -141,18 +145,18 @@ namespace webbuilder.api.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("webbuilder.api.models.AElement", b =>
-                {
-                    b.HasBaseType("webbuilder.api.models.Element");
-
-                    b.HasDiscriminator().HasValue("A");
-                });
-
             modelBuilder.Entity("webbuilder.api.models.FrameElement", b =>
                 {
                     b.HasBaseType("webbuilder.api.models.Element");
 
                     b.HasDiscriminator().HasValue("Frame");
+                });
+
+            modelBuilder.Entity("webbuilder.api.models.LinkElement", b =>
+                {
+                    b.HasBaseType("webbuilder.api.models.Element");
+
+                    b.HasDiscriminator().HasValue("Link");
                 });
 
             modelBuilder.Entity("webbuilder.api.models.TextElement", b =>

@@ -11,6 +11,7 @@ namespace webbuilder.api.mapping
             {
                 Type = element.Type,
                 Id = element.Id,
+                Name = element.Name,
                 Content = element.Content,
                 IsSelected = false,
                 Styles = element.Styles,
@@ -41,6 +42,7 @@ namespace webbuilder.api.mapping
             {
                 Type = element.Type,
                 Id = element.Id,
+                Name = element.Name,
                 Content = element.Content,
                 IsSelected = false,
                 Styles = element.Styles,

@@ -12,7 +12,8 @@ namespace webbuilder.api.models
         [Required]
         [JsonPropertyName("type")]
         public required string Type { get; set; }
-
+        [JsonPropertyName("name")]
+        public string? Name { get; set; }
         [JsonPropertyName("content")]
         public string? Content { get; set; }
 
