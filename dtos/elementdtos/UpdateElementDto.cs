@@ -15,6 +15,8 @@ namespace webbuilder.api.dtos
         public bool IsSelected { get; init; }
         [JsonPropertyName("styles")]
         public Dictionary<string, object> Styles { get; init; } = [];
+        [JsonPropertyName("tailwindStyles")]
+        public string? TailwindStyles { get; init; }
         [JsonPropertyName("x")]
         public double X { get; init; }
         [JsonPropertyName("y")]
