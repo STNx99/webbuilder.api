@@ -37,35 +37,49 @@ namespace webbuilder.api.services
         }
         public async Task<bool> DeleteElement(string id)
         {
-            var elementToDelete = await _dbContext.Elements
-                .Include(e => (e as FrameElement).Elements)
-                .FirstOrDefaultAsync(e => e.Id == id);
+            // Get all descendant IDs first
+            var allIds = new List<string> { id };
+            await GetDescendantIds(id, allIds);
 
-            if (elementToDelete == null)
+            using var transaction = await _dbContext.Database.BeginTransactionAsync();
+
+            try
             {
-                return false;
-            }
+                var element = await _dbContext.Elements
+                    .FirstOrDefaultAsync(e => e.Id == id);
 
-            var siblings = await _dbContext.Elements
-                .Where(e => e.ParentId == elementToDelete.ParentId && e.Order > elementToDelete.Order)
+                if (element == null) return false;
+
+                await _dbContext.Elements
+                    .Where(e => e.ParentId == element.ParentId && e.Order > element.Order)
+                    .ExecuteUpdateAsync(e => e.SetProperty(x => x.Order, x => x.Order - 1));
+
+                await _dbContext.Elements
+                    .Where(e => allIds.Contains(e.Id))
+                    .ExecuteDeleteAsync();
+
+                await transaction.CommitAsync();
+                return true;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+        }
+
+        private async Task GetDescendantIds(string parentId, List<string> ids)
+        {
+            var childIds = await _dbContext.Elements
+                .Where(e => e.ParentId == parentId)
+                .Select(e => e.Id)
                 .ToListAsync();
 
-            foreach (var sibling in siblings)
+            foreach (var childId in childIds)
             {
-                sibling.Order--;
+                ids.Add(childId);
+                await GetDescendantIds(childId, ids);
             }
-
-            if (elementToDelete is FrameElement frameElementToDelete && frameElementToDelete.Elements != null)
-            {
-                foreach (var child in frameElementToDelete.Elements.ToList())
-                {
-                    await DeleteElement(child.Id);
-                }
-            }
-
-            _dbContext.Elements.Remove(elementToDelete);
-            await _dbContext.SaveChangesAsync();
-            return true;
         }
 
         public async Task<bool> BatchCreateElements(IEnumerable<CreateElementDto> elements)

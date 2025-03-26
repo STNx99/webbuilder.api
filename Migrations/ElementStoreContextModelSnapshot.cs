@@ -66,6 +66,10 @@ namespace webbuilder.api.Migrations
                         .HasColumnType("text")
                         .HasAnnotation("Relational:JsonPropertyName", "styles");
 
+                    b.Property<string>("TailwindStyles")
+                        .HasColumnType("text")
+                        .HasAnnotation("Relational:JsonPropertyName", "tailwindStyles");
+
                     b.Property<string>("Type")
                         .IsRequired()
                         .HasMaxLength(8)
@@ -145,6 +149,20 @@ namespace webbuilder.api.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("webbuilder.api.models.ButtonElement", b =>
+                {
+                    b.HasBaseType("webbuilder.api.models.Element");
+
+                    b.HasDiscriminator().HasValue("Button");
+                });
+
+            modelBuilder.Entity("webbuilder.api.models.CarouselElement", b =>
+                {
+                    b.HasBaseType("webbuilder.api.models.Element");
+
+                    b.HasDiscriminator().HasValue("Carousel");
+                });
+
             modelBuilder.Entity("webbuilder.api.models.FrameElement", b =>
                 {
                     b.HasBaseType("webbuilder.api.models.Element");
@@ -168,6 +186,10 @@ namespace webbuilder.api.Migrations
 
             modelBuilder.Entity("webbuilder.api.models.Element", b =>
                 {
+                    b.HasOne("webbuilder.api.models.CarouselElement", null)
+                        .WithMany("Elements")
+                        .HasForeignKey("ParentId");
+
                     b.HasOne("webbuilder.api.models.FrameElement", null)
                         .WithMany("Elements")
                         .HasForeignKey("ParentId");
@@ -196,6 +218,11 @@ namespace webbuilder.api.Migrations
             modelBuilder.Entity("webbuilder.api.models.User", b =>
                 {
                     b.Navigation("Projects");
+                });
+
+            modelBuilder.Entity("webbuilder.api.models.CarouselElement", b =>
+                {
+                    b.Navigation("Elements");
                 });
 
             modelBuilder.Entity("webbuilder.api.models.FrameElement", b =>

@@ -7,6 +7,7 @@ namespace webbuilder.api.dtos
     [JsonDerivedType(typeof(TextElementDto), typeDiscriminator: "Text")]
     [JsonDerivedType(typeof(LinkElementDto), typeDiscriminator: "Link")]
     [JsonDerivedType(typeof(FrameElementDto), typeDiscriminator: "Frame")]
+    [JsonDerivedType(typeof(CarouselElementDto), typeDiscriminator: "Carousel")]
     public record class ElementDto
     {
         [JsonPropertyName("type")]
@@ -44,10 +45,20 @@ namespace webbuilder.api.dtos
     {
 
     }
+    public record class ButtonElementDto : ElementDto
+    {
+
+    }
+
+    public record class CarouselElementDto : ElementDto
+    {
+        [JsonPropertyName("elements")]
+        public List<ElementDto> Elements { get; init; } = [];
+    }
 
     public record class FrameElementDto : ElementDto
     {
         [JsonPropertyName("elements")]
-        public List<ElementDto> Elements { get; init; } = new List<ElementDto>();
+        public List<ElementDto> Elements { get; init; } = [];
     }
 }

@@ -34,12 +34,20 @@ namespace webbuilder.api.data
                 .HasDiscriminator(e => e.Type)
                 .HasValue<TextElement>("Text")
                 .HasValue<LinkElement>("Link")
-                .HasValue<FrameElement>("Frame");
+                .HasValue<FrameElement>("Frame")
+                .HasValue<ButtonElement>("Button")
+                .HasValue<CarouselElement>("Carousel");
 
             modelBuilder.Entity<FrameElement>()
                 .HasMany(e => e.Elements)
                 .WithOne()
                 .HasForeignKey(e => e.ParentId);
+
+            modelBuilder.Entity<CarouselElement>()
+                .HasMany(e => e.Elements)
+                .WithOne()
+                .HasForeignKey(e => e.ParentId);
+            
 
             modelBuilder.Entity<Element>()
                 .Property(e => e.Styles)
