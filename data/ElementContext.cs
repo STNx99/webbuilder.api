@@ -33,6 +33,7 @@ namespace webbuilder.api.data
             modelBuilder.Entity<Element>()
                 .HasDiscriminator(e => e.Type)
                 .HasValue<TextElement>("Text")
+                .HasValue<ImageElement>("Image")
                 .HasValue<LinkElement>("Link")
                 .HasValue<FrameElement>("Frame")
                 .HasValue<ButtonElement>("Button")
