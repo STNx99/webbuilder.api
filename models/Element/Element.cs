@@ -12,7 +12,8 @@ namespace webbuilder.api.models
         [Required]
         [JsonPropertyName("type")]
         public required string Type { get; set; }
-
+        [JsonPropertyName("name")]
+        public string? Name { get; set; }
         [JsonPropertyName("content")]
         public string? Content { get; set; }
 
@@ -20,13 +21,18 @@ namespace webbuilder.api.models
         public bool IsSelected { get; set; }
 
         [JsonPropertyName("styles")]
-        public Dictionary<string, string> Styles { get; set; } = new();
+        public Dictionary<string, object> Styles { get; set; } = [];
+        [JsonPropertyName("tailwindStyles")]
+        public string? TailwindStyles { get; set; }
+
+        [JsonPropertyName("order")]
+        public int Order { get; set; }
 
         [JsonPropertyName("x")]
-        public int X { get; set; }
+        public double X { get; set; }
 
         [JsonPropertyName("y")]
-        public int Y { get; set; }
+        public double Y { get; set; }
 
         [JsonPropertyName("src")]
         public string? Src { get; set; }
@@ -36,5 +42,8 @@ namespace webbuilder.api.models
 
         [JsonPropertyName("parentId")]
         public string? ParentId { get; set; }
+
+        [JsonPropertyName("projectId")]
+        public required string ProjectId { get; set; }
     }
 }

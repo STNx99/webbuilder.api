@@ -5,7 +5,7 @@ using webbuilder.api.services;
 namespace webbuilder.api.controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     public class ElementsController : ControllerBase
     {
         private readonly IElementsService _elementsService;
@@ -22,10 +22,17 @@ namespace webbuilder.api.controllers
             return Ok(result);
         }
 
-        [HttpGet]
-        public async Task<IActionResult> Get()
+        [HttpPost("batch")]
+        public async Task<IActionResult> BatchPost([FromBody] BatchCreateElementsDto request)
         {
-            var result = await _elementsService.GetElements();
+            var result = await _elementsService.BatchCreateElements(request.Elements);
+            return Ok(result);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> Get(string id)
+        {
+            var result = await _elementsService.GetElements(id);
             return Ok(result);
         }
 
@@ -52,6 +59,6 @@ namespace webbuilder.api.controllers
 
             return NoContent();
         }
-        
+
     }
 }
