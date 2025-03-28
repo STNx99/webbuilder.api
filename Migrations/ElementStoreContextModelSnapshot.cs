@@ -170,6 +170,13 @@ namespace webbuilder.api.Migrations
                     b.HasDiscriminator().HasValue("Frame");
                 });
 
+            modelBuilder.Entity("webbuilder.api.models.ImageElement", b =>
+                {
+                    b.HasBaseType("webbuilder.api.models.Element");
+
+                    b.HasDiscriminator().HasValue("Image");
+                });
+
             modelBuilder.Entity("webbuilder.api.models.LinkElement", b =>
                 {
                     b.HasBaseType("webbuilder.api.models.Element");

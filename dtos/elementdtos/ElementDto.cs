@@ -5,6 +5,8 @@ namespace webbuilder.api.dtos
 {
     [JsonPolymorphic(TypeDiscriminatorPropertyName = "Type")]
     [JsonDerivedType(typeof(TextElementDto), typeDiscriminator: "Text")]
+    [JsonDerivedType(typeof(ImageElementDto), typeDiscriminator: "Image")]
+    [JsonDerivedType(typeof(ButtonElementDto), typeDiscriminator: "Button")]
     [JsonDerivedType(typeof(LinkElementDto), typeDiscriminator: "Link")]
     [JsonDerivedType(typeof(FrameElementDto), typeDiscriminator: "Frame")]
     [JsonDerivedType(typeof(CarouselElementDto), typeDiscriminator: "Carousel")]
@@ -37,6 +39,10 @@ namespace webbuilder.api.dtos
         [Required] public required string ProjectId { get; init; }
     }
     public record class TextElementDto : ElementDto
+    {
+
+    }
+    public record class ImageElementDto : ElementDto
     {
 
     }
