@@ -20,7 +20,7 @@ namespace webbuilder.api.services
             var childCount = await _dbContext.Elements
                 .CountAsync(e => e.ParentId == element.ParentId);
 
-            var newElement = element.ToElement(childCount);
+            var newElement = element.ToElement(childCount++);
             await _dbContext.Elements.AddAsync(newElement);
             await _dbContext.SaveChangesAsync();
             return newElement.ToElementDto();
@@ -89,21 +89,39 @@ namespace webbuilder.api.services
                 throw new ArgumentException("The elements collection cannot be empty.");
             }
 
-            var parentId = elements.First().ParentId;
+            using var transaction = await _dbContext.Database.BeginTransactionAsync();
 
-            var childCount = await _dbContext.Elements
-                .CountAsync(e => e.ParentId == parentId);
-
-            foreach (var element in elements)
+            try
             {
-                var newElement = element.ToElement(childCount);
-                await _dbContext.Elements.AddAsync(newElement);
-                childCount++;
-            }
+                var elementsByParent = elements.ToLookup(e => e.ParentId);
 
-            await _dbContext.SaveChangesAsync();
-            return true;
+                foreach (var parentIdGroup in elementsByParent)
+                {
+                    var parentId = parentIdGroup.Key;
+
+                    var childCount = await _dbContext.Elements
+                        .CountAsync(e => e.ParentId == parentId);
+
+                    // Process all elements at this level
+                    foreach (var element in parentIdGroup)
+                    {
+                        var newElement = element.ToElement(childCount);
+                        await _dbContext.Elements.AddAsync(newElement);
+                        childCount++;
+                    }
+                }
+
+                await _dbContext.SaveChangesAsync();
+                await transaction.CommitAsync();
+                return true;
+            }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
         }
+
         public async Task<bool> UpdateElement(UpdateElementDto element)
         {
             var elementToUpdate = await _dbContext.Elements.FirstOrDefaultAsync(e => e.Id == element.Id);
