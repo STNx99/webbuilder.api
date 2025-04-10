@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using webbuilder.api.data;
 using webbuilder.api.middleware;
 using webbuilder.api.services;
+using webbuilder.api.repositories;
+using webbuilder.api.repositories.interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +20,11 @@ builder.Services.AddControllers();
 builder.Services.AddDbContext<ElementStoreContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// Register repositories
+builder.Services.AddScoped<IElementRepository, ElementRepository>();
+builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
+
+// Register services
 builder.Services.AddScoped<IElementsService, ElementsService>();
 builder.Services.AddScoped<IProjectsService, ProjectsService>();
 builder.Services.AddHttpContextAccessor();
