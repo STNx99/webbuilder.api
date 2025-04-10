@@ -1,84 +1,62 @@
-using Microsoft.EntityFrameworkCore;
-using webbuilder.api.data;
 using webbuilder.api.dtos;
 using webbuilder.api.mapping;
-using webbuilder.api.models;
+using webbuilder.api.repositories.interfaces;
 
 namespace webbuilder.api.services
 {
     public class ElementsService : IElementsService
     {
-        private readonly ElementStoreContext _dbContext;
+        private readonly IElementRepository _elementRepository;
 
-        public ElementsService(ElementStoreContext dbContext)
+        public ElementsService(IElementRepository elementRepository)
         {
-            _dbContext = dbContext;
+            _elementRepository = elementRepository;
         }
 
         public async Task<ElementDto> CreateElement(CreateElementDto element)
         {
-            var childCount = await _dbContext.Elements
-                .CountAsync(e => e.ParentId == element.ParentId);
+            var childCount = await _elementRepository.GetChildCountAsync(element.ParentId);
 
-            var newElement = element.ToElement(childCount++);
-            await _dbContext.Elements.AddAsync(newElement);
-            await _dbContext.SaveChangesAsync();
-            return newElement.ToElementDto();
+            var newElement = element.ToElement(childCount);
+            var createdElement = await _elementRepository.CreateAsync(newElement);
+            return createdElement.ToElementDto();
         }
 
         public async Task<IEnumerable<ElementDto>> GetElements(string id)
         {
-            var elements = await _dbContext.Elements
-                .Where(e => e.ProjectId == id)
-                .OrderBy(e => e.Order)
-                .ToListAsync();
+            var elements = await _elementRepository.GetByProjectIdAsync(id);
 
             return elements.Select(e => e.ToElementDto()).Where(e => e.ParentId == null);
         }
+
         public async Task<bool> DeleteElement(string id)
         {
             // Get all descendant IDs first
             var allIds = new List<string> { id };
-            await GetDescendantIds(id, allIds);
+            var descendantIds = await _elementRepository.GetDescendantIdsAsync(id);
+            allIds.AddRange(descendantIds);
 
-            using var transaction = await _dbContext.Database.BeginTransactionAsync();
-
-            try
+            using (await _elementRepository.BeginTransactionAsync())
             {
-                var element = await _dbContext.Elements
-                    .FirstOrDefaultAsync(e => e.Id == id);
+                try
+                {
+                    var element = await _elementRepository.GetByIdAsync(id);
+                    if (element == null) return false;
 
-                if (element == null) return false;
+                    // Update order of siblings
+                    await _elementRepository.UpdateOrdersAfterDeleteAsync(element.ParentId, element.Order);
 
-                await _dbContext.Elements
-                    .Where(e => e.ParentId == element.ParentId && e.Order > element.Order)
-                    .ExecuteUpdateAsync(e => e.SetProperty(x => x.Order, x => x.Order - 1));
+                    // Delete the element and all descendants
+                    await _elementRepository.DeleteManyAsync(allIds);
 
-                await _dbContext.Elements
-                    .Where(e => allIds.Contains(e.Id))
-                    .ExecuteDeleteAsync();
-
-                await transaction.CommitAsync();
-                return true;
-            }
-            catch
-            {
-                await transaction.RollbackAsync();
-                throw;
-            }
-        }
-
-        private async Task GetDescendantIds(string parentId, List<string> ids)
-        {
-            var childIds = await _dbContext.Elements
-                .Where(e => e.ParentId == parentId)
-                .Select(e => e.Id)
-                .ToListAsync();
-
-            foreach (var childId in childIds)
-            {
-                ids.Add(childId);
-                await GetDescendantIds(childId, ids);
+                    await _elementRepository.CommitTransactionAsync();
+                    return true;
+                }
+                catch
+                {
+                    await _elementRepository.RollbackTransactionAsync();
+                    throw;
+                }
             }
         }
 
@@ -89,42 +67,40 @@ namespace webbuilder.api.services
                 throw new ArgumentException("The elements collection cannot be empty.");
             }
 
-            using var transaction = await _dbContext.Database.BeginTransactionAsync();
-
-            try
+            using (await _elementRepository.BeginTransactionAsync())
             {
-                var elementsByParent = elements.ToLookup(e => e.ParentId);
-
-                foreach (var parentIdGroup in elementsByParent)
+                try
                 {
-                    var parentId = parentIdGroup.Key;
+                    var elementsByParent = elements.ToLookup(e => e.ParentId);
 
-                    var childCount = await _dbContext.Elements
-                        .CountAsync(e => e.ParentId == parentId);
-
-                    // Process all elements at this level
-                    foreach (var element in parentIdGroup)
+                    foreach (var parentIdGroup in elementsByParent)
                     {
-                        var newElement = element.ToElement(childCount);
-                        await _dbContext.Elements.AddAsync(newElement);
-                        childCount++;
-                    }
-                }
+                        var parentId = parentIdGroup.Key;
 
-                await _dbContext.SaveChangesAsync();
-                await transaction.CommitAsync();
-                return true;
-            }
-            catch (Exception)
-            {
-                await transaction.RollbackAsync();
-                throw;
+                        var childCount = await _elementRepository.GetChildCountAsync(parentId);
+
+                        foreach (var element in parentIdGroup)
+                        {
+                            var newElement = element.ToElement(childCount);
+                            await _elementRepository.CreateAsync(newElement);
+                            childCount++;
+                        }
+                    }
+
+                    await _elementRepository.CommitTransactionAsync();
+                    return true;
+                }
+                catch (Exception)
+                {
+                    await _elementRepository.RollbackTransactionAsync();
+                    throw;
+                }
             }
         }
 
         public async Task<bool> UpdateElement(UpdateElementDto element)
         {
-            var elementToUpdate = await _dbContext.Elements.FirstOrDefaultAsync(e => e.Id == element.Id);
+            var elementToUpdate = await _elementRepository.GetByIdAsync(element.Id);
             if (elementToUpdate == null)
             {
                 return false;
@@ -140,9 +116,7 @@ namespace webbuilder.api.services
             elementToUpdate.Src = element.Src ?? elementToUpdate.Src;
             elementToUpdate.Href = element.Href ?? elementToUpdate.Href;
 
-            await _dbContext.SaveChangesAsync();
-            return true;
+            return await _elementRepository.UpdateAsync(elementToUpdate);
         }
-
     }
 }
