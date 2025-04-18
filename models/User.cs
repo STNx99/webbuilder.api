@@ -9,6 +9,7 @@ namespace webbuilder.api.models
         public string? ImageUrl { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
-        public ICollection<Project> Projects { get; set; }
+        public ICollection<Project> Projects { get; set; } = new List<Project>();
+        public ICollection<Image> Images { get; set; } = new List<Image>();
     }
 }

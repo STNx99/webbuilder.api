@@ -45,5 +45,15 @@ namespace webbuilder.api.models
 
         [JsonPropertyName("projectId")]
         public required string ProjectId { get; set; }
+
+        // Navigation properties
+        [JsonIgnore]
+        public Element? Parent { get; set; }
+
+        [JsonIgnore]
+        public ICollection<Element> Children { get; set; } = new List<Element>();
+
+        [JsonIgnore]
+        public Project Project { get; set; } = null!;
     }
 }
