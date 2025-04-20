@@ -109,13 +109,14 @@ namespace webbuilder.api.services
             elementToUpdate.Type = element.Type;
             elementToUpdate.Name = element.Name;
             elementToUpdate.Content = element.Content;
-            elementToUpdate.IsSelected = element.IsSelected;
             elementToUpdate.Styles = element.Styles;
             elementToUpdate.X = element.X;
             elementToUpdate.Y = element.Y;
             elementToUpdate.Src = element.Src ?? elementToUpdate.Src;
             elementToUpdate.Href = element.Href ?? elementToUpdate.Href;
-
+            elementToUpdate.TailwindStyles = element.TailwindStyles;
+            elementToUpdate.ParentId = element.ParentId;
+            elementToUpdate.ProjectId = element.ProjectId;
             return await _elementRepository.UpdateAsync(elementToUpdate);
         }
     }
