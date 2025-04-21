@@ -97,6 +97,30 @@ namespace webbuilder.api.Migrations
                     b.UseTphMappingStrategy();
                 });
 
+            modelBuilder.Entity("webbuilder.api.models.Image", b =>
+                {
+                    b.Property<string>("ImageId")
+                        .HasColumnType("text");
+
+                    b.Property<byte[]>("ImageBlob")
+                        .IsRequired()
+                        .HasColumnType("bytea");
+
+                    b.Property<string>("ImageName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("ImageId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Images");
+                });
+
             modelBuilder.Entity("webbuilder.api.models.Project", b =>
                 {
                     b.Property<string>("Id")
@@ -112,6 +136,14 @@ namespace webbuilder.api.Migrations
                     b.Property<string>("OwnerId")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<bool>("Published")
+                        .HasColumnType("boolean")
+                        .HasColumnName("published");
+
+                    b.Property<string>("Subdomain")
+                        .HasColumnType("text")
+                        .HasColumnName("subdomain");
 
                     b.HasKey("Id");
 
@@ -153,12 +185,27 @@ namespace webbuilder.api.Migrations
                 {
                     b.HasBaseType("webbuilder.api.models.Element");
 
+                    b.Property<string>("ButtonType")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasAnnotation("Relational:JsonPropertyName", "buttonType");
+
+                    b.Property<string>("ElementId")
+                        .HasColumnType("text");
+
+                    b.HasIndex("ElementId");
+
                     b.HasDiscriminator().HasValue("Button");
                 });
 
             modelBuilder.Entity("webbuilder.api.models.CarouselElement", b =>
                 {
                     b.HasBaseType("webbuilder.api.models.Element");
+
+                    b.Property<string>("Settings")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasAnnotation("Relational:JsonPropertyName", "settings");
 
                     b.HasDiscriminator().HasValue("Carousel");
                 });
@@ -168,6 +215,8 @@ namespace webbuilder.api.Migrations
                     b.HasBaseType("webbuilder.api.models.Element");
 
                     b.HasDiscriminator().HasValue("Frame");
+
+                    b.HasAnnotation("Relational:JsonPropertyName", "element");
                 });
 
             modelBuilder.Entity("webbuilder.api.models.ImageElement", b =>
@@ -177,11 +226,46 @@ namespace webbuilder.api.Migrations
                     b.HasDiscriminator().HasValue("Image");
                 });
 
+            modelBuilder.Entity("webbuilder.api.models.InputElement", b =>
+                {
+                    b.HasBaseType("webbuilder.api.models.Element");
+
+                    b.Property<string>("InputSettings")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasAnnotation("Relational:JsonPropertyName", "inputSettings");
+
+                    b.HasDiscriminator().HasValue("Input");
+                });
+
             modelBuilder.Entity("webbuilder.api.models.LinkElement", b =>
                 {
                     b.HasBaseType("webbuilder.api.models.Element");
 
                     b.HasDiscriminator().HasValue("Link");
+                });
+
+            modelBuilder.Entity("webbuilder.api.models.ListElement", b =>
+                {
+                    b.HasBaseType("webbuilder.api.models.Element");
+
+                    b.HasDiscriminator().HasValue("List");
+                });
+
+            modelBuilder.Entity("webbuilder.api.models.SelectElement", b =>
+                {
+                    b.HasBaseType("webbuilder.api.models.Element");
+
+                    b.Property<string>("Options")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasAnnotation("Relational:JsonPropertyName", "options");
+
+                    b.Property<string>("SelectSettings")
+                        .HasColumnType("text")
+                        .HasAnnotation("Relational:JsonPropertyName", "selectSettings");
+
+                    b.HasDiscriminator().HasValue("Select");
                 });
 
             modelBuilder.Entity("webbuilder.api.models.TextElement", b =>
@@ -193,28 +277,56 @@ namespace webbuilder.api.Migrations
 
             modelBuilder.Entity("webbuilder.api.models.Element", b =>
                 {
-                    b.HasOne("webbuilder.api.models.CarouselElement", null)
-                        .WithMany("Elements")
-                        .HasForeignKey("ParentId");
+                    b.HasOne("webbuilder.api.models.Element", "Parent")
+                        .WithMany("Children")
+                        .HasForeignKey("ParentId")
+                        .OnDelete(DeleteBehavior.NoAction);
 
-                    b.HasOne("webbuilder.api.models.FrameElement", null)
-                        .WithMany("Elements")
-                        .HasForeignKey("ParentId");
-
-                    b.HasOne("webbuilder.api.models.Project", null)
+                    b.HasOne("webbuilder.api.models.Project", "Project")
                         .WithMany("Elements")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Parent");
+
+                    b.Navigation("Project");
+                });
+
+            modelBuilder.Entity("webbuilder.api.models.Image", b =>
+                {
+                    b.HasOne("webbuilder.api.models.User", "User")
+                        .WithMany("Images")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("webbuilder.api.models.Project", b =>
                 {
-                    b.HasOne("webbuilder.api.models.User", null)
+                    b.HasOne("webbuilder.api.models.User", "Owner")
                         .WithMany("Projects")
                         .HasForeignKey("OwnerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Owner");
+                });
+
+            modelBuilder.Entity("webbuilder.api.models.ButtonElement", b =>
+                {
+                    b.HasOne("webbuilder.api.models.FrameElement", "Element")
+                        .WithMany()
+                        .HasForeignKey("ElementId");
+
+                    b.Navigation("Element");
+                });
+
+            modelBuilder.Entity("webbuilder.api.models.Element", b =>
+                {
+                    b.Navigation("Children");
                 });
 
             modelBuilder.Entity("webbuilder.api.models.Project", b =>
@@ -224,17 +336,9 @@ namespace webbuilder.api.Migrations
 
             modelBuilder.Entity("webbuilder.api.models.User", b =>
                 {
+                    b.Navigation("Images");
+
                     b.Navigation("Projects");
-                });
-
-            modelBuilder.Entity("webbuilder.api.models.CarouselElement", b =>
-                {
-                    b.Navigation("Elements");
-                });
-
-            modelBuilder.Entity("webbuilder.api.models.FrameElement", b =>
-                {
-                    b.Navigation("Elements");
                 });
 #pragma warning restore 612, 618
         }

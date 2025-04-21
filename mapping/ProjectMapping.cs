@@ -12,6 +12,8 @@ namespace webbuilder.api.mapping
                 Id = Guid.NewGuid().ToString(),
                 Name = project.Name,
                 Description = project.Description,
+                Subdomain = project.Subdomain,
+                Published = project.Published,
                 OwnerId = ownerId
             };
         }

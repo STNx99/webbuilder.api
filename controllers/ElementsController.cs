@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using webbuilder.api.dtos;
 using webbuilder.api.services;
+using webbuilder.api.mapping;
 
 namespace webbuilder.api.controllers
 {
@@ -19,7 +20,7 @@ namespace webbuilder.api.controllers
         public async Task<IActionResult> Post([FromBody] CreateElementDto element)
         {
             var result = await _elementsService.CreateElement(element);
-            return Ok(result);
+            return Ok(result); 
         }
 
         [HttpPost("batch")]
@@ -34,6 +35,17 @@ namespace webbuilder.api.controllers
         {
             var result = await _elementsService.GetElements(id);
             return Ok(result);
+        }
+
+        [HttpGet("public/{id}")]
+        public async Task<IActionResult> GetPublicElement(string id)
+        {
+            var elements = await _elementsService.GetElements(id);
+            if (elements == null || !elements.Any())
+                return NotFound();
+
+            var publicElements = elements.Select(e => e.ToPublicElementDto());
+            return Ok(publicElements);
         }
 
         [HttpDelete("{id}")]

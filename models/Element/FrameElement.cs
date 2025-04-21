@@ -1,7 +1,9 @@
+using System.Text.Json.Serialization;
+
 namespace webbuilder.api.models
 {
     public class FrameElement : Element
     {
-        public List<Element> Elements { get; set; } = new();
+        // Using the Children collection from base Element class to represent the elements array
     }
 }

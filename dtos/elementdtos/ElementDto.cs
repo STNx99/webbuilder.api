@@ -10,6 +10,9 @@ namespace webbuilder.api.dtos
     [JsonDerivedType(typeof(LinkElementDto), typeDiscriminator: "Link")]
     [JsonDerivedType(typeof(FrameElementDto), typeDiscriminator: "Frame")]
     [JsonDerivedType(typeof(CarouselElementDto), typeDiscriminator: "Carousel")]
+    [JsonDerivedType(typeof(InputElementDto), typeDiscriminator: "Input")]
+    [JsonDerivedType(typeof(ListElementDto), typeDiscriminator: "List")]
+    [JsonDerivedType(typeof(SelectElementDto), typeDiscriminator: "Select")]
     public record class ElementDto
     {
         [JsonPropertyName("type")]
@@ -66,5 +69,26 @@ namespace webbuilder.api.dtos
     {
         [JsonPropertyName("elements")]
         public List<ElementDto> Elements { get; init; } = [];
+    }
+
+    public record class InputElementDto : ElementDto
+    {
+        [JsonPropertyName("inputSettings")]
+        public Dictionary<string, object> InputSettings { get; init; } = [];
+    }
+
+    public record class ListElementDto : ElementDto
+    {
+        [JsonPropertyName("elements")]
+        public List<ElementDto> Elements { get; init; } = [];
+    }
+
+    public record class SelectElementDto : ElementDto
+    {
+        [JsonPropertyName("options")]
+        public List<Dictionary<string, object>> Options { get; init; } = [];
+
+        [JsonPropertyName("selectSettings")]
+        public Dictionary<string, object>? SelectSettings { get; init; }
     }
 }

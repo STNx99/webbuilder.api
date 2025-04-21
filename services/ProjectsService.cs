@@ -1,89 +1,74 @@
-using webbuilder.api.data;
 using webbuilder.api.dtos;
 using webbuilder.api.mapping;
-using Microsoft.EntityFrameworkCore;
+using webbuilder.api.repositories.interfaces;
 
 namespace webbuilder.api.services
 {
     public class ProjectsService : IProjectsService
     {
-        private readonly ElementStoreContext _context;
+        private readonly IProjectRepository _projectRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public ProjectsService(ElementStoreContext context, IHttpContextAccessor httpContextAccessor)
+        public ProjectsService(IProjectRepository projectRepository, IHttpContextAccessor httpContextAccessor)
         {
-            _context = context;
+            _projectRepository = projectRepository;
             _httpContextAccessor = httpContextAccessor;
+        }
+
+        // Helper method to get current user ID from HttpContext
+        private string GetCurrentUserId()
+        {
+            var httpContext = _httpContextAccessor.HttpContext;
+            if (httpContext == null || !httpContext.Items.TryGetValue("userId", out var userId))
+            {
+                throw new UnauthorizedAccessException("User is not authenticated");
+            }
+            return userId.ToString();
         }
 
         public async Task<ProjectDto> CreateProjectAsync(ProjectDto project)
         {
-            var find = await _context.Projects.FirstOrDefaultAsync(p => p.Name == project.Name);
-            if (find != null)
+            ArgumentNullException.ThrowIfNull(project);
+
+            string userIdString = GetCurrentUserId();
+
+            // Check if a project with this name already exists
+            var projectExists = await _projectRepository.ExistsByNameAsync(project.Name, userIdString);
+            if (projectExists)
             {
                 throw new ArgumentException("Project with this name already exists");
             }
-            ArgumentNullException.ThrowIfNull(project);
 
-            var httpContext = _httpContextAccessor.HttpContext;
-            if (httpContext == null)
-            {
-                return null;
-            }
-
-            if (!httpContext.Items.TryGetValue("userId", out var userId))
-            {
-                throw new ArgumentException("User ID cannot be null or empty.", nameof(userId));
-            }
-
-            var newProject = project.ToProject(userId.ToString());
-            await _context.Projects.AddAsync(newProject);
-            await _context.SaveChangesAsync();
-            return newProject.ToProjectDto();
+            var newProject = project.ToProject(userIdString);
+            var createdProject = await _projectRepository.CreateAsync(newProject);
+            return createdProject.ToProjectDto();
         }
 
         public async Task<IEnumerable<ProjectDto>> GetProjectsAsync()
         {
-            var httpContext = _httpContextAccessor.HttpContext;
-            if (httpContext == null)
+            try
+            {
+                string userId = GetCurrentUserId();
+                var projects = await _projectRepository.GetByUserIdAsync(userId);
+                return projects.Select(p => p.ToProjectDto());
+            }
+            catch (UnauthorizedAccessException)
             {
                 return Enumerable.Empty<ProjectDto>();
             }
-
-            if (!httpContext.Items.TryGetValue("userId", out var userId))
-            {
-                return Enumerable.Empty<ProjectDto>();
-            }
-
-            var projects = await _context.Projects
-                .Where(p => p.OwnerId == userId.ToString())
-                .ToListAsync();
-
-            return projects.Select(p => p.ToProjectDto());
         }
 
         public async Task<bool> DeleteProjectAsync(string id)
         {
-            var httpContext = _httpContextAccessor.HttpContext;
-            if (httpContext == null)
+            try
+            {
+                string userId = GetCurrentUserId();
+                return await _projectRepository.DeleteAsync(id, userId);
+            }
+            catch (UnauthorizedAccessException)
             {
                 return false;
             }
-            if (!httpContext.Items.TryGetValue("userId", out var userId))
-            {
-                return false;
-            }
-            var projectToDelete = await _context.Projects
-                .Include(p => p.Elements)
-                .FirstOrDefaultAsync(p => p.Id == id && p.OwnerId == userId.ToString());
-            if (projectToDelete == null)
-            {
-                return false;
-            }
-
-            _context.Projects.Remove(projectToDelete);
-            await _context.SaveChangesAsync();
-            return true;
         }
     }
 }
