@@ -65,6 +65,8 @@ namespace webbuilder.api.dtos
     {
         [JsonPropertyName("elements")]
         public List<PublicElementDto> Elements { get; init; } = [];
+        [JsonPropertyName("carouselSettings")]
+        public Dictionary<string, object>? CarouselSettings { get; init; }
     }
 
     public record class PublicFrameElementDto : PublicElementDto

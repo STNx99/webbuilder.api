@@ -21,7 +21,6 @@ namespace webbuilder.api.dtos
         public string? TailwindStyles { get; init; }
         [JsonPropertyName("order")]
         public int Order { get; init; }
-
         [JsonPropertyName("x")]
         public double X { get; init; }
         [JsonPropertyName("y")]
@@ -34,9 +33,10 @@ namespace webbuilder.api.dtos
         public string? ParentId { get; init; }
         [JsonPropertyName("projectId")]
         [Required] public required string ProjectId { get; init; }
-
         [JsonPropertyName("options")]
         public List<Dictionary<string, object>>? Options { get; init; }
+        [JsonPropertyName("carouselSettings")]
+        public Dictionary<string, object>? CarouselSettings { get; init; }
 
         [JsonPropertyName("selectSettings")]
         public Dictionary<string, object>? SelectSettings { get; init; }

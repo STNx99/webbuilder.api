@@ -1,5 +1,6 @@
 using webbuilder.api.dtos;
 using webbuilder.api.mapping;
+using webbuilder.api.models;
 using webbuilder.api.repositories.interfaces;
 
 namespace webbuilder.api.services
@@ -106,6 +107,7 @@ namespace webbuilder.api.services
                 return false;
             }
 
+            // Update base properties
             elementToUpdate.Type = element.Type;
             elementToUpdate.Name = element.Name;
             elementToUpdate.Content = element.Content;
@@ -117,6 +119,26 @@ namespace webbuilder.api.services
             elementToUpdate.TailwindStyles = element.TailwindStyles;
             elementToUpdate.ParentId = element.ParentId;
             elementToUpdate.ProjectId = element.ProjectId;
+
+            // Update specialized properties based on element type
+            switch (elementToUpdate)
+            {
+                case SelectElement selectElement when element.Options != null || element.SelectSettings != null:
+                    if (element.Options != null)
+                        selectElement.Options = element.Options;
+                    if (element.SelectSettings != null)
+                        selectElement.SelectSettings = element.SelectSettings;
+                    break;
+
+                case InputElement inputElement when element.InputSettings != null:
+                    inputElement.InputSettings = element.InputSettings;
+                    break;
+
+                case CarouselElement carouselElement when element.CarouselSettings != null:
+                    carouselElement.CarouselSettings = element.CarouselSettings;
+                    break;
+            }
+
             return await _elementRepository.UpdateAsync(elementToUpdate);
         }
     }

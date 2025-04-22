@@ -85,7 +85,7 @@ namespace webbuilder.api.mapping
                     ParentId = element.ParentId,
                     ProjectId = element.ProjectId ?? throw new ArgumentException("Project ID is required"),
                     Order = order,
-                    Settings = new Dictionary<string, object>()
+                    CarouselSettings = element.CarouselSettings ?? new Dictionary<string, object>(),
                 },
                 _ => new Element()
                 {
@@ -166,7 +166,8 @@ namespace webbuilder.api.mapping
                 Elements = carouselElement?.Children?
                     .OrderBy(e => e.Order)
                     .Select(e => e.ToElementDto())
-                    .ToList() ?? new()
+                    .ToList() ?? new(),
+                CarouselSettings = carouselElement?.CarouselSettings ?? new()
             };
         }
 
@@ -349,7 +350,8 @@ namespace webbuilder.api.mapping
                     Y = element.Y,
                     Src = element.Src,
                     Href = element.Href,
-                    Elements = (element as CarouselElementDto)?.Elements?.Select(e => e.ToPublicElementDto()).ToList() ?? new()
+                    Elements = (element as CarouselElementDto)?.Elements?.Select(e => e.ToPublicElementDto()).ToList() ?? new(),
+                    CarouselSettings = (element as CarouselElementDto)?.CarouselSettings ?? new()
                 },
                 "List" => new PublicListElementDto
                 {
