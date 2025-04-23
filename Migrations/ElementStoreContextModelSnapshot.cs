@@ -202,10 +202,10 @@ namespace webbuilder.api.Migrations
                 {
                     b.HasBaseType("webbuilder.api.models.Element");
 
-                    b.Property<string>("Settings")
+                    b.Property<string>("CarouselSettings")
                         .IsRequired()
                         .HasColumnType("text")
-                        .HasAnnotation("Relational:JsonPropertyName", "settings");
+                        .HasAnnotation("Relational:JsonPropertyName", "carouselSettings");
 
                     b.HasDiscriminator().HasValue("Carousel");
                 });

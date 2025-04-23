@@ -30,9 +30,11 @@ namespace webbuilder.api.dtos
         public string? ParentId { get; init; }
         [JsonPropertyName("projectId")]
         [Required] public required string ProjectId { get; init; }
-
         [JsonPropertyName("options")]
         public List<Dictionary<string, object>>? Options { get; init; }
+
+        [JsonPropertyName("carouselSettings")]
+        public Dictionary<string, object>? CarouselSettings { get; init; }
 
         [JsonPropertyName("selectSettings")]
         public Dictionary<string, object>? SelectSettings { get; init; }

@@ -96,7 +96,7 @@ namespace webbuilder.api.data
                 );
 
             modelBuilder.Entity<CarouselElement>()
-                .Property(e => e.Settings)
+                .Property(e => e.CarouselSettings)
                 .HasConversion(
                     v => v == null ? null : JsonSerializer.Serialize(v, new JsonSerializerOptions()),
                     v => string.IsNullOrEmpty(v) ? new Dictionary<string, object>() : JsonSerializer.Deserialize<Dictionary<string, object>>(v, new JsonSerializerOptions())
