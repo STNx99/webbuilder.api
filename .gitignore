@@ -482,3 +482,15 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+appsettings.json
+launchSettings.json
+Migrations
+
+# Configuration files with sensitive data
+appsettings.json
+appsettings.*.json
+Properties/launchSettings.json
+
+# But keep example templates
+!appsettings.example.json
+!launchSettings.example.json

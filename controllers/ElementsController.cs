@@ -1,11 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using webbuilder.api.dtos;
 using webbuilder.api.services;
+using webbuilder.api.mapping;
 
 namespace webbuilder.api.controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     public class ElementsController : ControllerBase
     {
         private readonly IElementsService _elementsService;
@@ -19,14 +20,32 @@ namespace webbuilder.api.controllers
         public async Task<IActionResult> Post([FromBody] CreateElementDto element)
         {
             var result = await _elementsService.CreateElement(element);
+            return Ok(result); 
+        }
+
+        [HttpPost("batch")]
+        public async Task<IActionResult> BatchPost([FromBody] BatchCreateElementsDto request)
+        {
+            var result = await _elementsService.BatchCreateElements(request.Elements);
             return Ok(result);
         }
 
-        [HttpGet]
-        public async Task<IActionResult> Get()
+        [HttpGet("{id}")]
+        public async Task<IActionResult> Get(string id)
         {
-            var result = await _elementsService.GetElements();
+            var result = await _elementsService.GetElements(id);
             return Ok(result);
+        }
+
+        [HttpGet("public/{id}")]
+        public async Task<IActionResult> GetPublicElement(string id)
+        {
+            var elements = await _elementsService.GetElements(id);
+            if (elements == null || !elements.Any())
+                return NotFound();
+
+            var publicElements = elements.Select(e => e.ToPublicElementDto());
+            return Ok(publicElements);
         }
 
         [HttpDelete("{id}")]
@@ -52,6 +71,6 @@ namespace webbuilder.api.controllers
 
             return NoContent();
         }
-        
+
     }
 }

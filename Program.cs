@@ -1,7 +1,11 @@
+using Microsoft.AspNetCore.Mvc.Versioning;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using webbuilder.api.data;
 using webbuilder.api.middleware;
 using webbuilder.api.services;
+using webbuilder.api.repositories;
+using webbuilder.api.repositories.interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,23 +15,62 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowAllOrigins",
      policy => { policy.WithOrigins("http://localhost:3000").AllowAnyHeader().AllowAnyMethod(); });
 });
-builder.Services.AddControllers();
+
+// Configure JSON serialization options
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
+        options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+    });
+
+// Register JSON polymorphic serialization
+builder.Services.Configure<Microsoft.AspNetCore.Mvc.JsonOptions>(options =>
+{
+    options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+});
 
 builder.Services.AddDbContext<ElementStoreContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// Register repositories
+builder.Services.AddScoped<IElementRepository, ElementRepository>();
+builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
+
+// Register services
 builder.Services.AddScoped<IElementsService, ElementsService>();
+builder.Services.AddScoped<IProjectsService, ProjectsService>();
+builder.Services.AddHttpContextAccessor();
 
+builder.Services.AddApiVersioning(options =>
+{
+    options.DefaultApiVersion = new ApiVersion(1, 0);
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.ReportApiVersions = true;
+    options.ApiVersionReader = new UrlSegmentApiVersionReader();
+});
 
+builder.Services.AddVersionedApiExplorer(options =>
+{
+    options.GroupNameFormat = "'v'VVV";
+    options.SubstituteApiVersionInUrl = true;
+});
 
 var app = builder.Build();
 app.UseCors("AllowAllOrigins");
-// Configure the HTTP request pipeline.
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
-app.UseUserAuthenticate();
+app.UseWhen(context =>
+    (context.Request.Path.StartsWithSegments("/api/v1.0/elements") &&
+     !context.Request.Path.StartsWithSegments("/api/v1.0/elements/public")) ||
+    context.Request.Path.StartsWithSegments("/api/v1.0/projects"), app =>
+{
+    app.UseUserAuthenticate();
+});
+
 app.UseHttpsRedirection();
 app.MapControllers();
 app.Run();
