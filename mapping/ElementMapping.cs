@@ -12,7 +12,7 @@ namespace webbuilder.api.mapping
             if (element == null)
                 throw new ArgumentNullException(nameof(element));
 
-            return element.Type switch
+            var result = element.Type switch
             {
                 "Input" => new InputElement()
                 {
@@ -29,8 +29,7 @@ namespace webbuilder.api.mapping
                     Href = element.Href,
                     ParentId = element.ParentId,
                     ProjectId = element.ProjectId ?? throw new ArgumentException("Project ID is required"),
-                    Order = order,
-                    InputSettings = element.InputSettings ?? new Dictionary<string, object>()
+                    Order = order
                 },
                 "Select" => new SelectElement()
                 {
@@ -48,8 +47,7 @@ namespace webbuilder.api.mapping
                     ParentId = element.ParentId,
                     ProjectId = element.ProjectId ?? throw new ArgumentException("Project ID is required"),
                     Order = order,
-                    Options = element.Options ?? new List<Dictionary<string, object>>(),
-                    SelectSettings = element.SelectSettings
+                    Options = element.Options ?? new List<Dictionary<string, object>>()
                 },
                 "Button" => new ButtonElement()
                 {
@@ -67,7 +65,7 @@ namespace webbuilder.api.mapping
                     ParentId = element.ParentId,
                     ProjectId = element.ProjectId ?? throw new ArgumentException("Project ID is required"),
                     Order = order,
-                    ButtonType = "default"
+                    ButtonType = element.ButtonType ?? "default"
                 },
                 "Carousel" => new CarouselElement()
                 {
@@ -84,8 +82,7 @@ namespace webbuilder.api.mapping
                     Href = element.Href,
                     ParentId = element.ParentId,
                     ProjectId = element.ProjectId ?? throw new ArgumentException("Project ID is required"),
-                    Order = order,
-                    CarouselSettings = element.CarouselSettings ?? new Dictionary<string, object>(),
+                    Order = order
                 },
                 _ => new Element()
                 {
@@ -105,9 +102,46 @@ namespace webbuilder.api.mapping
                     Order = order
                 }
             };
+
+            // Now add settings for specific element types
+            if (element.Type == "Input" && element.InputSettings != null)
+            {
+                result.Settings.Add(new Setting
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = "Input Settings",
+                    SettingType = "input",
+                    ElementId = result.Id,
+                    Settings = element.InputSettings
+                });
+            }
+            else if (element.Type == "Select" && element.SelectSettings != null)
+            {
+                result.Settings.Add(new Setting
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = "Select Settings",
+                    SettingType = "select",
+                    ElementId = result.Id,
+                    Settings = element.SelectSettings
+                });
+            }
+            else if (element.Type == "Carousel" && element.CarouselSettings != null)
+            {
+                result.Settings.Add(new Setting
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = "Carousel Settings",
+                    SettingType = "carousel",
+                    ElementId = result.Id,
+                    Settings = element.CarouselSettings
+                });
+            }
+
+            return result;
         }
 
-        public static ElementDto ToElementDto(this Element element)
+        public static ElementDto ToElementDto(this Element element, Dictionary<string, object>? settings = null)
         {
             if (element == null)
                 throw new ArgumentNullException(nameof(element));
@@ -115,10 +149,10 @@ namespace webbuilder.api.mapping
             return element.Type switch
             {
                 "Frame" => element.ToFrameElementDto(),
-                "Carousel" => element.ToCarouselElementDto(),
-                "List" => element.ToListElementDto(),
-                "Input" => element.ToInputElementDto(),
-                "Select" => element.ToSelectElementDto(),
+                "Carousel" => element.ToCarouselElementDto(settings),
+                "ListItem" => element.ToListElementDto(),
+                "Input" => element.ToInputElementDto(settings),
+                "Select" => element.ToSelectElementDto(settings),
                 "Button" => element.ToButtonElementDto(),
                 _ => new ElementDto()
                 {
@@ -139,7 +173,7 @@ namespace webbuilder.api.mapping
             };
         }
 
-        public static CarouselElementDto ToCarouselElementDto(this Element element)
+        public static CarouselElementDto ToCarouselElementDto(this Element element, Dictionary<string, object>? settings = null)
         {
             if (element == null)
                 throw new ArgumentNullException(nameof(element));
@@ -167,7 +201,7 @@ namespace webbuilder.api.mapping
                     .OrderBy(e => e.Order)
                     .Select(e => e.ToElementDto())
                     .ToList() ?? new(),
-                CarouselSettings = carouselElement?.CarouselSettings ?? new()
+                CarouselSettings = settings ?? new()
             };
         }
 
@@ -206,7 +240,7 @@ namespace webbuilder.api.mapping
         {
             if (element == null)
                 throw new ArgumentNullException(nameof(element));
-            if (element.Type != "List")
+            if (element.Type != "ListItem")
                 throw new ArgumentException("Element must be of type List");
 
             var listElement = element as ListElement;
@@ -230,10 +264,11 @@ namespace webbuilder.api.mapping
                     .OrderBy(e => e.Order)
                     .Select(e => e.ToElementDto())
                     .ToList() ?? new()
+        
             };
         }
 
-        public static InputElementDto ToInputElementDto(this Element element)
+        public static InputElementDto ToInputElementDto(this Element element, Dictionary<string, object>? settings = null)
         {
             if (element == null)
                 throw new ArgumentNullException(nameof(element));
@@ -257,11 +292,11 @@ namespace webbuilder.api.mapping
                 Href = element.Href,
                 ParentId = element.ParentId,
                 ProjectId = element.ProjectId,
-                InputSettings = inputElement?.InputSettings ?? new()
+                InputSettings = settings ?? new(),
             };
         }
 
-        public static SelectElementDto ToSelectElementDto(this Element element)
+        public static SelectElementDto ToSelectElementDto(this Element element, Dictionary<string, object>? settings = null)
         {
             if (element == null)
                 throw new ArgumentNullException(nameof(element));
@@ -286,7 +321,7 @@ namespace webbuilder.api.mapping
                 ParentId = element.ParentId,
                 ProjectId = element.ProjectId,
                 Options = selectElement?.Options ?? new(),
-                SelectSettings = selectElement?.SelectSettings
+                SelectSettings = settings ?? new()
             };
         }
 
@@ -353,7 +388,7 @@ namespace webbuilder.api.mapping
                     Elements = (element as CarouselElementDto)?.Elements?.Select(e => e.ToPublicElementDto()).ToList() ?? new(),
                     CarouselSettings = (element as CarouselElementDto)?.CarouselSettings ?? new()
                 },
-                "List" => new PublicListElementDto
+                "ListItem" => new PublicListElementDto
                 {
                     Type = element.Type,
                     Id = element.Id,

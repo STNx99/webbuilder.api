@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using webbuilder.api.data;
+using webbuilder.api.dtos.projectdtos;
 using webbuilder.api.models;
 using webbuilder.api.repositories.interfaces;
 
@@ -54,6 +55,26 @@ namespace webbuilder.api.repositories
         {
             return await _dbContext.Projects
                 .AnyAsync(p => p.Name == name && p.OwnerId == userId);
+        }
+        public async Task<bool> UpdateAsync(string id, UpdateProjectDto project)
+        {
+            var existingProject = await _dbContext.Projects
+                .Include(p => p.Elements)
+                .FirstOrDefaultAsync(p => p.Id == id);
+
+            if (existingProject == null)
+            {
+                return false;
+            }
+
+            existingProject.Name = project.Name ?? existingProject.Name;
+            existingProject.Description = project.Description;
+            existingProject.Subdomain = project.Subdomain;
+            existingProject.Published = project.Published;
+            existingProject.Styles = project.Styles;
+
+            _dbContext.Projects.Update(existingProject);
+            return await _dbContext.SaveChangesAsync() > 0;
         }
     }
 }

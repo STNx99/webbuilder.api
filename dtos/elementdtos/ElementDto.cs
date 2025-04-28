@@ -11,7 +11,7 @@ namespace webbuilder.api.dtos
     [JsonDerivedType(typeof(FrameElementDto), typeDiscriminator: "Frame")]
     [JsonDerivedType(typeof(CarouselElementDto), typeDiscriminator: "Carousel")]
     [JsonDerivedType(typeof(InputElementDto), typeDiscriminator: "Input")]
-    [JsonDerivedType(typeof(ListElementDto), typeDiscriminator: "List")]
+    [JsonDerivedType(typeof(ListElementDto), typeDiscriminator: "ListItem")]
     [JsonDerivedType(typeof(SelectElementDto), typeDiscriminator: "Select")]
     public record class ElementDto
     {
@@ -56,7 +56,8 @@ namespace webbuilder.api.dtos
     }
     public record class ButtonElementDto : ElementDto
     {
-
+        [JsonPropertyName("buttonType")]
+        public string? ButtonType { get; init; }
     }
 
     public record class CarouselElementDto : ElementDto

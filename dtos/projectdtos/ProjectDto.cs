@@ -9,5 +9,6 @@ namespace webbuilder.api.dtos
         public string? Description { get; set; }
         public string? Subdomain { get; set; }
         public bool Published { get; set; } = false;
+        public Dictionary<string, object> Styles { get; set; } = [];
     }
 }

@@ -1,4 +1,5 @@
 using webbuilder.api.dtos;
+using webbuilder.api.dtos.projectdtos;
 using webbuilder.api.mapping;
 using webbuilder.api.repositories.interfaces;
 
@@ -32,7 +33,6 @@ namespace webbuilder.api.services
 
             string userIdString = GetCurrentUserId();
 
-            // Check if a project with this name already exists
             var projectExists = await _projectRepository.ExistsByNameAsync(project.Name, userIdString);
             if (projectExists)
             {
@@ -54,7 +54,7 @@ namespace webbuilder.api.services
             }
             catch (UnauthorizedAccessException)
             {
-                return Enumerable.Empty<ProjectDto>();
+                return [];
             }
         }
 
@@ -69,6 +69,23 @@ namespace webbuilder.api.services
             {
                 return false;
             }
+        }
+        public async Task<ProjectDto?> GetProjectByIdAsync(string id)
+        {
+            string userIdString = GetCurrentUserId();
+            var project = await _projectRepository.GetByIdAsync(id, userIdString);
+            return project?.ToProjectDto();
+        }
+        public async Task<bool> UpdateProjectAsync(string id, UpdateProjectDto projectDto)
+        {
+            ArgumentNullException.ThrowIfNull(projectDto);
+            string userIdString = GetCurrentUserId();
+            if (userIdString == null)
+            {
+                throw new UnauthorizedAccessException("User is not authenticated");
+            }
+            var result = await _projectRepository.UpdateAsync(id, projectDto);
+            return result;
         }
     }
 }

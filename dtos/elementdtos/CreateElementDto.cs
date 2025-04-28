@@ -31,6 +31,8 @@ namespace webbuilder.api.dtos
         public string? Href { get; init; }
         [JsonPropertyName("parentId")]
         public string? ParentId { get; init; }
+        [JsonPropertyName("buttonType")]
+        public string? ButtonType { get; init; }
         [JsonPropertyName("projectId")]
         [Required] public required string ProjectId { get; init; }
         [JsonPropertyName("options")]

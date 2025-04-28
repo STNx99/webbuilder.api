@@ -27,11 +27,17 @@ namespace webbuilder.api.dtos
         public string? Src { get; init; }
         [JsonPropertyName("href")]
         public string? Href { get; init; }
+        [JsonPropertyName("parentId")]
         public string? ParentId { get; init; }
+        [JsonPropertyName("buttonType")]
+        public string? ButtonType { get; init; }
         [JsonPropertyName("projectId")]
         [Required] public required string ProjectId { get; init; }
         [JsonPropertyName("options")]
         public List<Dictionary<string, object>>? Options { get; init; }
+
+        [JsonPropertyName("elements")]
+        public List<object>? Elements { get; init; }
 
         [JsonPropertyName("carouselSettings")]
         public Dictionary<string, object>? CarouselSettings { get; init; }
