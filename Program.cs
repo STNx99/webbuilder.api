@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using webbuilder.api.data;
 using webbuilder.api.middleware;
 using webbuilder.api.services;
+using webbuilder.api.services.interfaces;
 using webbuilder.api.repositories;
 using webbuilder.api.repositories.interfaces;
 
@@ -36,10 +37,12 @@ builder.Services.AddDbContext<ElementStoreContext>(options =>
 // Register repositories
 builder.Services.AddScoped<IElementRepository, ElementRepository>();
 builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
+builder.Services.AddScoped<ISettingsRepository, SettingsRepository>();
 
 // Register services
 builder.Services.AddScoped<IElementsService, ElementsService>();
 builder.Services.AddScoped<IProjectsService, ProjectsService>();
+builder.Services.AddScoped<ISettingsService, SettingsService>();
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddApiVersioning(options =>

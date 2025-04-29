@@ -20,7 +20,7 @@ namespace webbuilder.api.controllers
         public async Task<IActionResult> Post([FromBody] CreateElementDto element)
         {
             var result = await _elementsService.CreateElement(element);
-            return Ok(result); 
+            return Ok(result);
         }
 
         [HttpPost("batch")]
@@ -60,6 +60,7 @@ namespace webbuilder.api.controllers
             return NoContent();
         }
 
+        [HttpPut]
         public async Task<IActionResult> Put([FromBody] UpdateElementDto element)
         {
             var result = await _elementsService.UpdateElement(element);

@@ -141,6 +141,10 @@ namespace webbuilder.api.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("published");
 
+                    b.Property<string>("Styles")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("Subdomain")
                         .HasColumnType("text")
                         .HasColumnName("subdomain");
@@ -150,6 +154,35 @@ namespace webbuilder.api.Migrations
                     b.HasIndex("OwnerId");
 
                     b.ToTable("Projects");
+                });
+
+            modelBuilder.Entity("webbuilder.api.models.Setting", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ElementId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("SettingType")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasAnnotation("Relational:JsonPropertyName", "settingType");
+
+                    b.Property<string>("Settings")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasAnnotation("Relational:JsonPropertyName", "settings");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ElementId");
+
+                    b.ToTable("Settings");
                 });
 
             modelBuilder.Entity("webbuilder.api.models.User", b =>
@@ -202,11 +235,6 @@ namespace webbuilder.api.Migrations
                 {
                     b.HasBaseType("webbuilder.api.models.Element");
 
-                    b.Property<string>("CarouselSettings")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasAnnotation("Relational:JsonPropertyName", "carouselSettings");
-
                     b.HasDiscriminator().HasValue("Carousel");
                 });
 
@@ -230,11 +258,6 @@ namespace webbuilder.api.Migrations
                 {
                     b.HasBaseType("webbuilder.api.models.Element");
 
-                    b.Property<string>("InputSettings")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasAnnotation("Relational:JsonPropertyName", "inputSettings");
-
                     b.HasDiscriminator().HasValue("Input");
                 });
 
@@ -249,7 +272,7 @@ namespace webbuilder.api.Migrations
                 {
                     b.HasBaseType("webbuilder.api.models.Element");
 
-                    b.HasDiscriminator().HasValue("List");
+                    b.HasDiscriminator().HasValue("ListItem");
                 });
 
             modelBuilder.Entity("webbuilder.api.models.SelectElement", b =>
@@ -260,10 +283,6 @@ namespace webbuilder.api.Migrations
                         .IsRequired()
                         .HasColumnType("text")
                         .HasAnnotation("Relational:JsonPropertyName", "options");
-
-                    b.Property<string>("SelectSettings")
-                        .HasColumnType("text")
-                        .HasAnnotation("Relational:JsonPropertyName", "selectSettings");
 
                     b.HasDiscriminator().HasValue("Select");
                 });
@@ -315,6 +334,16 @@ namespace webbuilder.api.Migrations
                     b.Navigation("Owner");
                 });
 
+            modelBuilder.Entity("webbuilder.api.models.Setting", b =>
+                {
+                    b.HasOne("webbuilder.api.models.Element", "Element")
+                        .WithMany("Settings")
+                        .HasForeignKey("ElementId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("Element");
+                });
+
             modelBuilder.Entity("webbuilder.api.models.ButtonElement", b =>
                 {
                     b.HasOne("webbuilder.api.models.FrameElement", "Element")
@@ -327,6 +356,8 @@ namespace webbuilder.api.Migrations
             modelBuilder.Entity("webbuilder.api.models.Element", b =>
                 {
                     b.Navigation("Children");
+
+                    b.Navigation("Settings");
                 });
 
             modelBuilder.Entity("webbuilder.api.models.Project", b =>
