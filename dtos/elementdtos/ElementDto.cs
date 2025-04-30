@@ -13,6 +13,7 @@ namespace webbuilder.api.dtos
     [JsonDerivedType(typeof(InputElementDto), typeDiscriminator: "Input")]
     [JsonDerivedType(typeof(ListElementDto), typeDiscriminator: "ListItem")]
     [JsonDerivedType(typeof(SelectElementDto), typeDiscriminator: "Select")]
+    [JsonDerivedType(typeof(FormElementDto), typeDiscriminator: "Form")]
     public record class ElementDto
     {
         [JsonPropertyName("type")]
@@ -93,5 +94,13 @@ namespace webbuilder.api.dtos
 
         [JsonPropertyName("selectSettings")]
         public Dictionary<string, object>? SelectSettings { get; init; }
+    }
+
+    public record class FormElementDto : ElementDto
+    {
+        [JsonPropertyName("elements")]
+        public List<ElementDto> Elements { get; init; } = [];
+        [JsonPropertyName("formSettings")]
+        public Dictionary<string, object>? FormSettings { get; init; }
     }
 }

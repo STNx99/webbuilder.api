@@ -44,5 +44,7 @@ namespace webbuilder.api.dtos
         public Dictionary<string, object>? SelectSettings { get; init; }
         [JsonPropertyName("inputSettings")]
         public Dictionary<string, object>? InputSettings { get; init; }
+        [JsonPropertyName("formSettings")]
+        public Dictionary<string, object>? FormSettings { get; init; }
     }
 }

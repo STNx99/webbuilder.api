@@ -62,6 +62,7 @@ namespace webbuilder.api.data
                 .HasValue<CarouselElement>("Carousel")
                 .HasValue<InputElement>("Input")
                 .HasValue<ListElement>("ListItem")
+                .HasValue<FormElement>("Form")
                 .HasValue<SelectElement>("Select");
 
             modelBuilder.Entity<Project>().Property(e => e.Styles)

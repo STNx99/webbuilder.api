@@ -102,12 +102,11 @@ namespace webbuilder.api.Migrations
                     b.Property<string>("ImageId")
                         .HasColumnType("text");
 
-                    b.Property<byte[]>("ImageBlob")
+                    b.Property<string>("ImageLink")
                         .IsRequired()
-                        .HasColumnType("bytea");
+                        .HasColumnType("text");
 
                     b.Property<string>("ImageName")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("UserId")
@@ -236,6 +235,13 @@ namespace webbuilder.api.Migrations
                     b.HasBaseType("webbuilder.api.models.Element");
 
                     b.HasDiscriminator().HasValue("Carousel");
+                });
+
+            modelBuilder.Entity("webbuilder.api.models.FormElement", b =>
+                {
+                    b.HasBaseType("webbuilder.api.models.Element");
+
+                    b.HasDiscriminator().HasValue("Form");
                 });
 
             modelBuilder.Entity("webbuilder.api.models.FrameElement", b =>
