@@ -28,6 +28,7 @@ namespace webbuilder.api.controllers
             var result = await _projectsService.GetProjectsAsync();
             return Ok(result);
         }
+        
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(string id)
         {
@@ -40,7 +41,7 @@ namespace webbuilder.api.controllers
             return NoContent();
         }
         [HttpGet("{id}")]
-        public async Task<IActionResult> Get(string id)
+        public async Task<IActionResult> GetById(string id)
         {
             var result = await _projectsService.GetProjectByIdAsync(id);
             if (result == null)

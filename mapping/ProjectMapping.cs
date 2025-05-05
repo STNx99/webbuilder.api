@@ -15,7 +15,8 @@ namespace webbuilder.api.mapping
                 Description = project.Description,
                 Subdomain = project.Subdomain,
                 Published = project.Published,
-                OwnerId = ownerId
+                OwnerId = ownerId,
+                Styles = project.Styles ?? []
             };
         }
 
@@ -28,7 +29,8 @@ namespace webbuilder.api.mapping
                 Description = project.Description ?? string.Empty,
                 Subdomain = project.Subdomain,
                 Published = project.Published,
-                OwnerId = ownerId
+                OwnerId = ownerId,
+                Styles = project.Styles ?? [],
             };
         }
 
@@ -41,7 +43,7 @@ namespace webbuilder.api.mapping
                 Description = project.Description,
                 Subdomain = project.Subdomain,
                 Published = project.Published,
-                Styles = new Dictionary<string, object>() // Initialize empty styles or map from project if available
+                Styles = project.Styles ?? [],
             };
         }
     }
