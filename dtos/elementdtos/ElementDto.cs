@@ -6,6 +6,7 @@ namespace webbuilder.api.dtos
     [JsonPolymorphic(TypeDiscriminatorPropertyName = "Type")]
     [JsonDerivedType(typeof(TextElementDto), typeDiscriminator: "Text")]
     [JsonDerivedType(typeof(ImageElementDto), typeDiscriminator: "Image")]
+    [JsonDerivedType(typeof(HeadingElementDto), typeDiscriminator: "Heading")]
     [JsonDerivedType(typeof(ButtonElementDto), typeDiscriminator: "Button")]
     [JsonDerivedType(typeof(LinkElementDto), typeDiscriminator: "Link")]
     [JsonDerivedType(typeof(FrameElementDto), typeDiscriminator: "Frame")]
@@ -30,6 +31,7 @@ namespace webbuilder.api.dtos
         public Dictionary<string, object> Styles { get; init; } = [];
         [JsonPropertyName("tailwindStyles")]
         public string? TailwindStyles { get; init; }
+        [JsonPropertyName("x")]
         public double X { get; init; }
         [JsonPropertyName("y")]
         public double Y { get; init; }
@@ -45,6 +47,9 @@ namespace webbuilder.api.dtos
     public record class TextElementDto : ElementDto
     {
 
+    }
+    public record class HeadingElementDto : ElementDto
+    {
     }
     public record class ImageElementDto : ElementDto
     {

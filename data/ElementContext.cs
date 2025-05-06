@@ -63,7 +63,8 @@ namespace webbuilder.api.data
                 .HasValue<InputElement>("Input")
                 .HasValue<ListElement>("ListItem")
                 .HasValue<FormElement>("Form")
-                .HasValue<SelectElement>("Select");
+                .HasValue<SelectElement>("Select")
+                .HasValue<HeadingElement>("Heading");
 
             modelBuilder.Entity<Project>().Property(e => e.Styles)
                 .HasConversion(
