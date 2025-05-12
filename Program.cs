@@ -37,11 +37,13 @@ builder.Services.AddDbContext<ElementStoreContext>(options =>
 builder.Services.AddScoped<IElementRepository, ElementRepository>();
 builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
 builder.Services.AddScoped<ISettingsRepository, SettingsRepository>();
+builder.Services.AddScoped<IImageRepository, ImageRepository>();
 
 // Register services
 builder.Services.AddScoped<IElementsService, ElementsService>();
 builder.Services.AddScoped<IProjectsService, ProjectsService>();
 builder.Services.AddScoped<ISettingsService, SettingsService>();
+builder.Services.AddScoped<IImageService, ImageService>();
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddApiVersioning(options =>
@@ -68,7 +70,8 @@ if (app.Environment.IsDevelopment())
 app.UseWhen(context =>
     (context.Request.Path.StartsWithSegments("/api/v1.0/elements") &&
      !context.Request.Path.StartsWithSegments("/api/v1.0/elements/public")) ||
-    context.Request.Path.StartsWithSegments("/api/v1.0/projects"), app =>
+    context.Request.Path.StartsWithSegments("/api/v1.0/projects") ||
+    context.Request.Path.StartsWithSegments("/api/v1.0/images"), app =>
 {
     app.UseUserAuthenticate();
 });
