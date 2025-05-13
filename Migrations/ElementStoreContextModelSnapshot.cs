@@ -253,6 +253,13 @@ namespace webbuilder.api.Migrations
                     b.HasAnnotation("Relational:JsonPropertyName", "element");
                 });
 
+            modelBuilder.Entity("webbuilder.api.models.HeadingElement", b =>
+                {
+                    b.HasBaseType("webbuilder.api.models.Element");
+
+                    b.HasDiscriminator().HasValue("Heading");
+                });
+
             modelBuilder.Entity("webbuilder.api.models.ImageElement", b =>
                 {
                     b.HasBaseType("webbuilder.api.models.Element");
@@ -305,7 +312,7 @@ namespace webbuilder.api.Migrations
                     b.HasOne("webbuilder.api.models.Element", "Parent")
                         .WithMany("Children")
                         .HasForeignKey("ParentId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("webbuilder.api.models.Project", "Project")
                         .WithMany("Elements")

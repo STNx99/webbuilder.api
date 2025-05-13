@@ -99,9 +99,9 @@ namespace webbuilder.api.services
 
         public async Task<bool> DeleteElement(string id)
         {
-            var allIds = new List<string> { id };
-            var descendantIds = await _elementRepository.GetDescendantIdsAsync(id);
-            allIds.AddRange(descendantIds);
+            // var allIds = new List<string> { id };
+            // var descendantIds = await _elementRepository.GetDescendantIdsAsync(id);
+            // allIds.AddRange(descendantIds);
 
             using (await _elementRepository.BeginTransactionAsync())
             {
@@ -112,7 +112,7 @@ namespace webbuilder.api.services
 
                     await _elementRepository.UpdateOrdersAfterDeleteAsync(element.ParentId, element.Order);
 
-                    await _elementRepository.DeleteManyAsync(allIds);
+                    await _elementRepository.DeleteAsync(id);
 
                     await _elementRepository.CommitTransactionAsync();
                     return true;
