@@ -6,6 +6,7 @@ namespace webbuilder.api.dtos
     [JsonPolymorphic(TypeDiscriminatorPropertyName = "Type")]
     [JsonDerivedType(typeof(TextElementDto), typeDiscriminator: "Text")]
     [JsonDerivedType(typeof(ImageElementDto), typeDiscriminator: "Image")]
+    [JsonDerivedType(typeof(HeadingElementDto), typeDiscriminator: "Heading")]
     [JsonDerivedType(typeof(ButtonElementDto), typeDiscriminator: "Button")]
     [JsonDerivedType(typeof(LinkElementDto), typeDiscriminator: "Link")]
     [JsonDerivedType(typeof(FrameElementDto), typeDiscriminator: "Frame")]
@@ -13,6 +14,7 @@ namespace webbuilder.api.dtos
     [JsonDerivedType(typeof(InputElementDto), typeDiscriminator: "Input")]
     [JsonDerivedType(typeof(ListElementDto), typeDiscriminator: "ListItem")]
     [JsonDerivedType(typeof(SelectElementDto), typeDiscriminator: "Select")]
+    [JsonDerivedType(typeof(FormElementDto), typeDiscriminator: "Form")]
     public record class ElementDto
     {
         [JsonPropertyName("type")]
@@ -29,6 +31,7 @@ namespace webbuilder.api.dtos
         public Dictionary<string, object> Styles { get; init; } = [];
         [JsonPropertyName("tailwindStyles")]
         public string? TailwindStyles { get; init; }
+        [JsonPropertyName("x")]
         public double X { get; init; }
         [JsonPropertyName("y")]
         public double Y { get; init; }
@@ -44,6 +47,9 @@ namespace webbuilder.api.dtos
     public record class TextElementDto : ElementDto
     {
 
+    }
+    public record class HeadingElementDto : ElementDto
+    {
     }
     public record class ImageElementDto : ElementDto
     {
@@ -93,5 +99,13 @@ namespace webbuilder.api.dtos
 
         [JsonPropertyName("selectSettings")]
         public Dictionary<string, object>? SelectSettings { get; init; }
+    }
+
+    public record class FormElementDto : ElementDto
+    {
+        [JsonPropertyName("elements")]
+        public List<ElementDto> Elements { get; init; } = [];
+        [JsonPropertyName("formSettings")]
+        public Dictionary<string, object>? FormSettings { get; init; }
     }
 }

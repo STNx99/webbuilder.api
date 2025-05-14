@@ -49,7 +49,7 @@ namespace webbuilder.api.data
                 .HasOne(e => e.Parent)
                 .WithMany(e => e.Children)
                 .HasForeignKey(e => e.ParentId)
-                .OnDelete(DeleteBehavior.NoAction)
+                .OnDelete(DeleteBehavior.Cascade)
                 .IsRequired(false);
 
             modelBuilder.Entity<Element>()
@@ -62,7 +62,9 @@ namespace webbuilder.api.data
                 .HasValue<CarouselElement>("Carousel")
                 .HasValue<InputElement>("Input")
                 .HasValue<ListElement>("ListItem")
-                .HasValue<SelectElement>("Select");
+                .HasValue<FormElement>("Form")
+                .HasValue<SelectElement>("Select")
+                .HasValue<HeadingElement>("Heading");
 
             modelBuilder.Entity<Project>().Property(e => e.Styles)
                 .HasConversion(

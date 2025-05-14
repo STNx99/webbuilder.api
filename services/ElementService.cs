@@ -1,6 +1,5 @@
 using webbuilder.api.dtos;
 using webbuilder.api.mapping;
-using webbuilder.api.models;
 using webbuilder.api.repositories.interfaces;
 using webbuilder.api.services.interfaces;
 
@@ -40,6 +39,10 @@ namespace webbuilder.api.services
                     {
                         await _settingsService.UpdateElementSettingAsync(createdElement.Id, "carousel", carouselElement.CarouselSettings);
                     }
+                    else if (element.Type == "Form" && element is CreateElementDto { FormSettings: not null } formElement)
+                    {
+                        await _settingsService.UpdateElementSettingAsync(createdElement.Id, "form", formElement.FormSettings);
+                    }
 
                     await _elementRepository.CommitTransactionAsync();
                     return createdElement.ToElementDto();
@@ -54,16 +57,13 @@ namespace webbuilder.api.services
 
         public async Task<IEnumerable<ElementDto>> GetElements(string id)
         {
-            // Try to get elements by project ID first
             var elements = await _elementRepository.GetByProjectIdAsync(id);
 
-            // If no elements found, the ID might be a parent ID of nested elements
             if (!elements.Any())
             {
                 var element = await _elementRepository.GetByIdAsync(id);
                 if (element != null)
                 {
-                    // Return empty collection for elements not found
                     return Enumerable.Empty<ElementDto>();
                 }
             }
@@ -74,7 +74,6 @@ namespace webbuilder.api.services
             {
                 Dictionary<string, object>? settings = null;
 
-                // Fetch specific settings based on element type
                 if (element.Type == "Input")
                 {
                     settings = await _settingsService.GetElementSettingAsync(element.Id, "input");
@@ -87,18 +86,22 @@ namespace webbuilder.api.services
                 {
                     settings = await _settingsService.GetElementSettingAsync(element.Id, "carousel");
                 }
+                else if (element.Type == "Form")
+                {
+                    settings = await _settingsService.GetElementSettingAsync(element.Id, "form");
+                }
 
                 result.Add(element.ToElementDto(settings));
             }
 
-            return result.Where(e=> e.ParentId == null);
+            return result.Where(e => e.ParentId == null);
         }
 
         public async Task<bool> DeleteElement(string id)
         {
-            var allIds = new List<string> { id };
-            var descendantIds = await _elementRepository.GetDescendantIdsAsync(id);
-            allIds.AddRange(descendantIds);
+            // var allIds = new List<string> { id };
+            // var descendantIds = await _elementRepository.GetDescendantIdsAsync(id);
+            // allIds.AddRange(descendantIds);
 
             using (await _elementRepository.BeginTransactionAsync())
             {
@@ -109,7 +112,7 @@ namespace webbuilder.api.services
 
                     await _elementRepository.UpdateOrdersAfterDeleteAsync(element.ParentId, element.Order);
 
-                    await _elementRepository.DeleteManyAsync(allIds);
+                    await _elementRepository.DeleteAsync(id);
 
                     await _elementRepository.CommitTransactionAsync();
                     return true;
@@ -158,6 +161,10 @@ namespace webbuilder.api.services
                             {
                                 await _settingsService.UpdateElementSettingAsync(createdElement.Id, "carousel", carouselElement.CarouselSettings);
                             }
+                            else if (element.Type == "Form" && element is CreateElementDto { FormSettings: not null } formElement)
+                            {
+                                await _settingsService.UpdateElementSettingAsync(createdElement.Id, "form", formElement.FormSettings);
+                            }
                             childCount++;
                         }
                     }
@@ -197,11 +204,30 @@ namespace webbuilder.api.services
                 elementToUpdate.Src = element.Src ?? elementToUpdate.Src;
                 elementToUpdate.Href = element.Href ?? elementToUpdate.Href;
                 elementToUpdate.TailwindStyles = element.TailwindStyles;
-                elementToUpdate.ParentId = element.ParentId;
 
+                // Make sure we're not losing the ProjectId during updates
                 if (!string.IsNullOrEmpty(element.ProjectId) && elementToUpdate.ProjectId != element.ProjectId)
                 {
                     elementToUpdate.ProjectId = element.ProjectId;
+                }
+
+                // Validate ParentId - if it's not null, make sure it exists
+                if (element.ParentId != null)
+                {
+                    var parentExists = await _elementRepository.GetByIdAsync(element.ParentId) != null;
+                    if (!parentExists)
+                    {
+                        // Parent doesn't exist, so set to null to avoid FK constraint violation
+                        elementToUpdate.ParentId = null;
+                    }
+                    else
+                    {
+                        elementToUpdate.ParentId = element.ParentId;
+                    }
+                }
+                else
+                {
+                    elementToUpdate.ParentId = null;
                 }
 
                 switch (elementType)
@@ -224,6 +250,12 @@ namespace webbuilder.api.services
                             await _settingsService.UpdateElementSettingAsync(elementToUpdate.Id, "carousel", element.CarouselSettings);
                         }
                         break;
+                    case "Form":
+                        if (element.FormSettings != null)
+                        {
+                            await _settingsService.UpdateElementSettingAsync(elementToUpdate.Id, "form", element.FormSettings);
+                        }
+                        break;
                     case "Frame":
                         break;
                     case "Button":
@@ -236,7 +268,6 @@ namespace webbuilder.api.services
             }
             catch (Exception ex)
             {
-                // Log the error
                 Console.WriteLine($"Error updating element: {ex.Message}");
                 throw;
             }

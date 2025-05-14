@@ -102,12 +102,11 @@ namespace webbuilder.api.Migrations
                     b.Property<string>("ImageId")
                         .HasColumnType("text");
 
-                    b.Property<byte[]>("ImageBlob")
+                    b.Property<string>("ImageLink")
                         .IsRequired()
-                        .HasColumnType("bytea");
+                        .HasColumnType("text");
 
                     b.Property<string>("ImageName")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("UserId")
@@ -238,6 +237,13 @@ namespace webbuilder.api.Migrations
                     b.HasDiscriminator().HasValue("Carousel");
                 });
 
+            modelBuilder.Entity("webbuilder.api.models.FormElement", b =>
+                {
+                    b.HasBaseType("webbuilder.api.models.Element");
+
+                    b.HasDiscriminator().HasValue("Form");
+                });
+
             modelBuilder.Entity("webbuilder.api.models.FrameElement", b =>
                 {
                     b.HasBaseType("webbuilder.api.models.Element");
@@ -245,6 +251,13 @@ namespace webbuilder.api.Migrations
                     b.HasDiscriminator().HasValue("Frame");
 
                     b.HasAnnotation("Relational:JsonPropertyName", "element");
+                });
+
+            modelBuilder.Entity("webbuilder.api.models.HeadingElement", b =>
+                {
+                    b.HasBaseType("webbuilder.api.models.Element");
+
+                    b.HasDiscriminator().HasValue("Heading");
                 });
 
             modelBuilder.Entity("webbuilder.api.models.ImageElement", b =>
@@ -299,7 +312,7 @@ namespace webbuilder.api.Migrations
                     b.HasOne("webbuilder.api.models.Element", "Parent")
                         .WithMany("Children")
                         .HasForeignKey("ParentId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("webbuilder.api.models.Project", "Project")
                         .WithMany("Elements")

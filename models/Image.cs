@@ -7,9 +7,9 @@ namespace webbuilder.api.models
         [Key]
         public required string ImageId { get; set; }
 
-        public required byte[] ImageBlob { get; set; }
+        public required string ImageLink { get; set; }
 
-        public required string ImageName { get; set; }
+        public string? ImageName { get; set; }
 
         public required string UserId { get; set; }
 

@@ -40,12 +40,8 @@ namespace webbuilder.api.controllers
         [HttpGet("public/{id}")]
         public async Task<IActionResult> GetPublicElement(string id)
         {
-            var elements = await _elementsService.GetElements(id);
-            if (elements == null || !elements.Any())
-                return NotFound();
-
-            var publicElements = elements.Select(e => e.ToPublicElementDto());
-            return Ok(publicElements);
+            var result = await _elementsService.GetElements(id);
+            return Ok(result);
         }
 
         [HttpDelete("{id}")]

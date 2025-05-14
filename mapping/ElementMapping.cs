@@ -1,5 +1,3 @@
-using System;
-using System.Linq;
 using webbuilder.api.dtos;
 using webbuilder.api.models;
 
@@ -84,6 +82,22 @@ namespace webbuilder.api.mapping
                     ProjectId = element.ProjectId ?? throw new ArgumentException("Project ID is required"),
                     Order = order
                 },
+                "Form" => new FormElement(){
+                    Type = element.Type,
+                    Id = element.Id ?? Guid.NewGuid().ToString(),
+                    Name = element.Name,
+                    Content = element.Content,
+                    IsSelected = false,
+                    Styles = element.Styles ?? new(),
+                    X = element.X,
+                    Y = element.Y,
+                    TailwindStyles = element.TailwindStyles,
+                    Src = element.Src,
+                    Href = element.Href,
+                    ParentId = element.ParentId,
+                    ProjectId = element.ProjectId ?? throw new ArgumentException("Project ID is required"),
+                    Order = order
+                },
                 _ => new Element()
                 {
                     Type = element.Type ?? throw new ArgumentException("Element type is required"),
@@ -103,7 +117,6 @@ namespace webbuilder.api.mapping
                 }
             };
 
-            // Now add settings for specific element types
             if (element.Type == "Input" && element.InputSettings != null)
             {
                 result.Settings.Add(new Setting
@@ -137,6 +150,17 @@ namespace webbuilder.api.mapping
                     Settings = element.CarouselSettings
                 });
             }
+            else if (element.Type == "Form" && element.FormSettings != null)
+            {
+                result.Settings.Add(new Setting
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = "Form Settings",
+                    SettingType = "form",
+                    ElementId = result.Id,
+                    Settings = element.FormSettings
+                });
+            }
 
             return result;
         }
@@ -154,6 +178,7 @@ namespace webbuilder.api.mapping
                 "Input" => element.ToInputElementDto(settings),
                 "Select" => element.ToSelectElementDto(settings),
                 "Button" => element.ToButtonElementDto(),
+                "Form" => element.ToFormElementDto(settings),
                 _ => new ElementDto()
                 {
                     Type = element.Type,
@@ -264,7 +289,7 @@ namespace webbuilder.api.mapping
                     .OrderBy(e => e.Order)
                     .Select(e => e.ToElementDto())
                     .ToList() ?? new()
-        
+
             };
         }
 
@@ -324,6 +349,35 @@ namespace webbuilder.api.mapping
                 SelectSettings = settings ?? new()
             };
         }
+        public static FormElementDto ToFormElementDto(this Element element, Dictionary<string, object>? settings)
+        {
+            if (element == null)
+                throw new ArgumentNullException(nameof(element));
+            if (element.Type != "Form")
+                throw new ArgumentException("Element must be of type Form");
+            var formElement = element as FormElement;
+            return new FormElementDto()
+            {
+                Type = element.Type,
+                Id = element.Id,
+                Name = element.Name,
+                Content = element.Content,
+                IsSelected = element.IsSelected,
+                Styles = element.Styles,
+                TailwindStyles = element.TailwindStyles,
+                X = element.X,
+                Y = element.Y,
+                Src = element.Src,
+                Href = element.Href,
+                ParentId = element.ParentId,
+                ProjectId = element.ProjectId,
+                Elements = formElement?.Children?
+                    .OrderBy(e => e.Order)
+                    .Select(e => e.ToElementDto())
+                    .ToList() ?? new(),
+                FormSettings = settings ?? new()
+            };
+        }
 
         public static ButtonElementDto ToButtonElementDto(this Element element)
         {
@@ -348,159 +402,11 @@ namespace webbuilder.api.mapping
                 Src = element.Src,
                 Href = element.Href,
                 ParentId = element.ParentId,
-                ProjectId = element.ProjectId
+                ProjectId = element.ProjectId,
+                ButtonType = buttonElement?.ButtonType ?? "default"
             };
         }
 
-        public static PublicElementDto ToPublicElementDto(this ElementDto element)
-        {
-            if (element == null)
-                throw new ArgumentNullException(nameof(element));
 
-            return element.Type switch
-            {
-                "Frame" => new PublicFrameElementDto
-                {
-                    Type = element.Type,
-                    Id = element.Id,
-                    Name = element.Name,
-                    Content = element.Content,
-                    Styles = element.Styles,
-                    TailwindStyles = element.TailwindStyles,
-                    X = element.X,
-                    Y = element.Y,
-                    Src = element.Src,
-                    Href = element.Href,
-                    Elements = (element as FrameElementDto)?.Elements?.Select(e => e.ToPublicElementDto()).ToList() ?? new()
-                },
-                "Carousel" => new PublicCarouselElementDto
-                {
-                    Type = element.Type,
-                    Id = element.Id,
-                    Name = element.Name,
-                    Content = element.Content,
-                    Styles = element.Styles,
-                    TailwindStyles = element.TailwindStyles,
-                    X = element.X,
-                    Y = element.Y,
-                    Src = element.Src,
-                    Href = element.Href,
-                    Elements = (element as CarouselElementDto)?.Elements?.Select(e => e.ToPublicElementDto()).ToList() ?? new(),
-                    CarouselSettings = (element as CarouselElementDto)?.CarouselSettings ?? new()
-                },
-                "ListItem" => new PublicListElementDto
-                {
-                    Type = element.Type,
-                    Id = element.Id,
-                    Name = element.Name,
-                    Content = element.Content,
-                    Styles = element.Styles,
-                    TailwindStyles = element.TailwindStyles,
-                    X = element.X,
-                    Y = element.Y,
-                    Src = element.Src,
-                    Href = element.Href,
-                    Elements = (element as ListElementDto)?.Elements?.Select(e => e.ToPublicElementDto()).ToList() ?? new()
-                },
-                "Input" => new PublicInputElementDto
-                {
-                    Type = element.Type,
-                    Id = element.Id,
-                    Name = element.Name,
-                    Content = element.Content,
-                    Styles = element.Styles,
-                    TailwindStyles = element.TailwindStyles,
-                    X = element.X,
-                    Y = element.Y,
-                    Src = element.Src,
-                    Href = element.Href,
-                    InputSettings = (element as InputElementDto)?.InputSettings ?? new()
-                },
-                "Select" => new PublicSelectElementDto
-                {
-                    Type = element.Type,
-                    Id = element.Id,
-                    Name = element.Name,
-                    Content = element.Content,
-                    Styles = element.Styles,
-                    TailwindStyles = element.TailwindStyles,
-                    X = element.X,
-                    Y = element.Y,
-                    Src = element.Src,
-                    Href = element.Href,
-                    Options = (element as SelectElementDto)?.Options ?? new()
-                },
-                "Button" => new PublicButtonElementDto
-                {
-                    Type = element.Type,
-                    Id = element.Id,
-                    Name = element.Name,
-                    Content = element.Content,
-                    Styles = element.Styles,
-                    TailwindStyles = element.TailwindStyles,
-                    X = element.X,
-                    Y = element.Y,
-                    Src = element.Src,
-                    Href = element.Href
-                },
-                "Link" => new PublicLinkElementDto
-                {
-                    Type = element.Type,
-                    Id = element.Id,
-                    Name = element.Name,
-                    Content = element.Content,
-                    Styles = element.Styles,
-                    TailwindStyles = element.TailwindStyles,
-                    X = element.X,
-                    Y = element.Y,
-                    Src = element.Src,
-                    Href = element.Href
-                },
-                "Image" => new PublicImageElementDto
-                {
-                    Type = element.Type,
-                    Id = element.Id,
-                    Name = element.Name,
-                    Content = element.Content,
-                    Styles = element.Styles,
-                    TailwindStyles = element.TailwindStyles,
-                    X = element.X,
-                    Y = element.Y,
-                    Src = element.Src,
-                    Href = element.Href
-                },
-                "Text" => new PublicTextElementDto
-                {
-                    Type = element.Type,
-                    Id = element.Id,
-                    Name = element.Name,
-                    Content = element.Content,
-                    Styles = element.Styles,
-                    TailwindStyles = element.TailwindStyles,
-                    X = element.X,
-                    Y = element.Y,
-                    Src = element.Src,
-                    Href = element.Href
-                },
-                _ => new PublicElementDto
-                {
-                    Type = element.Type,
-                    Id = element.Id,
-                    Name = element.Name,
-                    Content = element.Content,
-                    Styles = element.Styles,
-                    TailwindStyles = element.TailwindStyles,
-                    X = element.X,
-                    Y = element.Y,
-                    Src = element.Src,
-                    Href = element.Href
-                }
-            };
-        }
-
-        public static PublicElementDto ToPublicElementDto(this Element element)
-        {
-            return element.ToElementDto().ToPublicElementDto();
-        }
     }
 }
