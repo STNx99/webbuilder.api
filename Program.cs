@@ -7,8 +7,19 @@ using webbuilder.api.services;
 using webbuilder.api.services.interfaces;
 using webbuilder.api.repositories;
 using webbuilder.api.repositories.interfaces;
+using System.Security.Authentication;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Configure HttpClient SSL/TLS settings
+HttpClientHandler handler = new HttpClientHandler();
+handler.SslProtocols = SslProtocols.Tls12 | SslProtocols.Tls13;
+handler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => true;
+handler.CheckCertificateRevocationList = false;
+
+builder.Services.AddSingleton(handler);
+builder.Services.AddHttpClient("ClerkClient")
+    .ConfigurePrimaryHttpMessageHandler(() => handler);
 
 builder.Services.AddOpenApi();
 builder.Services.AddCors(options =>
