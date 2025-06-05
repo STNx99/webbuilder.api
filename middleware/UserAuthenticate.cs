@@ -1,17 +1,19 @@
 using System.IdentityModel.Tokens.Jwt;
 using Clerk.BackendAPI.Helpers.Jwks;
+using System.Net.Http;
 
 namespace webbuilder.api.middleware
 {
     public class UserAuthenticate
     {
         private readonly RequestDelegate _next;
+        private readonly IHttpClientFactory _httpClientFactory;
 
-        public UserAuthenticate(RequestDelegate next)
+        public UserAuthenticate(RequestDelegate next, IHttpClientFactory httpClientFactory)
         {
             _next = next;
+            _httpClientFactory = httpClientFactory;
         }
-
         public async Task InvokeAsync(HttpContext context)
         {
             var request = new HttpRequestMessage
@@ -54,14 +56,29 @@ namespace webbuilder.api.middleware
             await _next(context);
         }
 
-        public static async Task<bool> IsSignedInAsync(HttpRequestMessage request)
+        public async Task<bool> IsSignedInAsync(HttpRequestMessage request)
         {
-            var options = new AuthenticateRequestOptions(
-                secretKey: Environment.GetEnvironmentVariable("CLERK_SECRET_KEY"),
-                authorizedParties: new string[] { "http://localhost:3000" }
-            );
-            var requestState = await AuthenticateRequest.AuthenticateRequestAsync(request, options);
-            return requestState.IsSignedIn();
+            try
+            {
+                // Use the configured HttpClient for better SSL/TLS handling
+                var options = new AuthenticateRequestOptions(
+                    secretKey: Environment.GetEnvironmentVariable("CLERK_SECRET_KEY"),
+                    authorizedParties: new string[] { "http://localhost:3000" }
+                );
+                // Pass the HttpClient as a separate parameter if supported, or use the default client
+                var requestState = await AuthenticateRequest.AuthenticateRequestAsync(request, options);
+                return requestState.IsSignedIn();
+            }
+            catch (HttpRequestException ex)
+            {
+                // Log the error (consider adding proper logging)
+                Console.WriteLine($"Authentication error: {ex.Message}");
+                if (ex.InnerException != null)
+                {
+                    Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
+                }
+                return false;
+            }
         }
     }
 

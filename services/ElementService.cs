@@ -68,33 +68,63 @@ namespace webbuilder.api.services
                 }
             }
 
+            // Create a dictionary to store element settings by element ID
+            var elementSettings = new Dictionary<string, Dictionary<string, object>>();
+
+            // Load settings for all elements
+            foreach (var element in elements)
+            {
+                string elementType = element.Type?.Trim() ?? string.Empty;
+
+                // Case-insensitive comparison for all element types 
+                if (string.Equals(elementType, "Carousel", StringComparison.OrdinalIgnoreCase))
+                {
+                    var settings = await _settingsService.GetElementSettingAsync(element.Id, "carousel");
+                    if (settings != null)
+                    {
+                        elementSettings[element.Id] = settings;
+                    }
+                }
+                else if (string.Equals(elementType, "Input", StringComparison.OrdinalIgnoreCase))
+                {
+                    var settings = await _settingsService.GetElementSettingAsync(element.Id, "input");
+                    if (settings != null)
+                    {
+                        elementSettings[element.Id] = settings;
+                    }
+                }
+                else if (string.Equals(elementType, "Select", StringComparison.OrdinalIgnoreCase))
+                {
+                    var settings = await _settingsService.GetElementSettingAsync(element.Id, "select");
+                    if (settings != null)
+                    {
+                        elementSettings[element.Id] = settings;
+                    }
+                }
+                else if (string.Equals(elementType, "Form", StringComparison.OrdinalIgnoreCase))
+                {
+                    var settings = await _settingsService.GetElementSettingAsync(element.Id, "form");
+                    if (settings != null)
+                    {
+                        elementSettings[element.Id] = settings;
+                    }
+                }
+            }
+
             var result = new List<ElementDto>();
 
+            // Process all elements and convert to DTOs with settings
             foreach (var element in elements.OrderBy(e => e.Order))
             {
-                Dictionary<string, object>? settings = null;
+                // Try to get settings for this element
+                elementSettings.TryGetValue(element.Id, out var settings);
 
-                if (element.Type == "Input")
-                {
-                    settings = await _settingsService.GetElementSettingAsync(element.Id, "input");
-                }
-                else if (element.Type == "Select")
-                {
-                    settings = await _settingsService.GetElementSettingAsync(element.Id, "select");
-                }
-                else if (element.Type == "Carousel")
-                {
-                    settings = await _settingsService.GetElementSettingAsync(element.Id, "carousel");
-                }
-                else if (element.Type == "Form")
-                {
-                    settings = await _settingsService.GetElementSettingAsync(element.Id, "form");
-                }
-
+                // Convert to DTO with settings
                 result.Add(element.ToElementDto(settings));
             }
 
-            return result.Where(e => e.ParentId == null);
+            // Only return top-level elements
+            return result.Where(e => e.ParentId == null).ToList();
         }
 
         public async Task<bool> DeleteElement(string id)
@@ -193,6 +223,7 @@ namespace webbuilder.api.services
                 var elementType = element.Type;
                 if (!string.IsNullOrEmpty(elementType))
                 {
+                    elementType = elementType.Trim();
                     elementToUpdate.Type = elementType;
                 }
 

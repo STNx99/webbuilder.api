@@ -82,7 +82,8 @@ namespace webbuilder.api.mapping
                     ProjectId = element.ProjectId ?? throw new ArgumentException("Project ID is required"),
                     Order = order
                 },
-                "Form" => new FormElement(){
+                "Form" => new FormElement()
+                {
                     Type = element.Type,
                     Id = element.Id ?? Guid.NewGuid().ToString(),
                     Name = element.Name,
@@ -164,45 +165,43 @@ namespace webbuilder.api.mapping
 
             return result;
         }
-
         public static ElementDto ToElementDto(this Element element, Dictionary<string, object>? settings = null)
         {
             if (element == null)
-                throw new ArgumentNullException(nameof(element));
-
-            return element.Type switch
-            {
-                "Frame" => element.ToFrameElementDto(),
-                "Carousel" => element.ToCarouselElementDto(settings),
-                "ListItem" => element.ToListElementDto(),
-                "Input" => element.ToInputElementDto(settings),
-                "Select" => element.ToSelectElementDto(settings),
-                "Button" => element.ToButtonElementDto(),
-                "Form" => element.ToFormElementDto(settings),
-                _ => new ElementDto()
+                throw new ArgumentNullException(nameof(element)); return element.Type switch
                 {
-                    Type = element.Type,
-                    Id = element.Id,
-                    Name = element.Name,
-                    Content = element.Content,
-                    IsSelected = element.IsSelected,
-                    Styles = element.Styles,
-                    TailwindStyles = element.TailwindStyles,
-                    X = element.X,
-                    Y = element.Y,
-                    Src = element.Src,
-                    Href = element.Href,
-                    ParentId = element.ParentId,
-                    ProjectId = element.ProjectId,
-                }
-            };
+                    "Frame" => element.ToFrameElementDto(settings),
+                    "Carousel" => element.ToCarouselElementDto(settings),
+                    "List" => element.ToListElementDto(),
+                    "Input" => element.ToInputElementDto(settings),
+                    "Select" => element.ToSelectElementDto(settings),
+                    "Button" => element.ToButtonElementDto(),
+                    "Form" => element.ToFormElementDto(settings),
+                    _ => new ElementDto()
+                    {
+                        Type = element.Type,
+                        Id = element.Id,
+                        Name = element.Name,
+                        Content = element.Content,
+                        IsSelected = element.IsSelected,
+                        Styles = element.Styles,
+                        TailwindStyles = element.TailwindStyles,
+                        X = element.X,
+                        Y = element.Y,
+                        Src = element.Src,
+                        Href = element.Href,
+                        ParentId = element.ParentId,
+                        ProjectId = element.ProjectId,
+                    }
+                };
         }
-
         public static CarouselElementDto ToCarouselElementDto(this Element element, Dictionary<string, object>? settings = null)
         {
             if (element == null)
                 throw new ArgumentNullException(nameof(element));
-            if (element.Type != "Carousel")
+
+            // Case-insensitive type comparison
+            if (!string.Equals(element.Type, "Carousel", StringComparison.OrdinalIgnoreCase))
                 throw new ArgumentException("Element must be of type Carousel");
 
             var carouselElement = element as CarouselElement;
@@ -226,15 +225,16 @@ namespace webbuilder.api.mapping
                     .OrderBy(e => e.Order)
                     .Select(e => e.ToElementDto())
                     .ToList() ?? new(),
-                CarouselSettings = settings ?? new()
+                CarouselSettings = settings ?? carouselElement?.CarouselSettings ?? new()
             };
         }
-
-        public static FrameElementDto ToFrameElementDto(this Element element)
+        public static FrameElementDto ToFrameElementDto(this Element element, Dictionary<string, object>? settings = null)
         {
             if (element == null)
                 throw new ArgumentNullException(nameof(element));
-            if (element.Type != "Frame")
+
+            // Case-insensitive type comparison
+            if (!string.Equals(element.Type, "Frame", StringComparison.OrdinalIgnoreCase))
                 throw new ArgumentException("Element must be of type Frame");
 
             var frameElement = element as FrameElement;
@@ -256,7 +256,15 @@ namespace webbuilder.api.mapping
                 ProjectId = element.ProjectId,
                 Elements = frameElement?.Children?
                     .OrderBy(e => e.Order)
-                    .Select(e => e.ToElementDto())
+                    .Select(child =>
+                    {
+                        // For any child elements that are carousels, ensure we get settings
+                        if (string.Equals(child.Type, "Carousel", StringComparison.OrdinalIgnoreCase))
+                        {
+                            return child.ToCarouselElementDto(null);
+                        }
+                        return child.ToElementDto();
+                    })
                     .ToList() ?? new()
             };
         }
